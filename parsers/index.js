@@ -17,3 +17,6 @@ export { fetchJobs as fetchMonsterJobs } from './monster.js';
 export { fetchJobs as fetchEmploiticJobs } from './emploitic.js';
 export { fetchJobs as fetchKeljobJobs } from './keljob.js';
 export { fetchJobs as fetchViteajobJobs } from './viteajob.js';
+export { fetchJobs as fetchIndeedJobs } from './indeed.js';
+export { fetchJobs as fetchLinkedInJobs } from './linkedin.js';
+export { fetchJobs as fetchFranceTravailJobs } from './francetravail.js';
