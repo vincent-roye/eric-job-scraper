@@ -1,3 +1,8 @@
+/**
+ * Parser pour Jobinja (Iran)
+ * Timeout souvent - augmente le delai
+ */
+
 import axios from 'axios';
 
 export async function fetchJobs() {
@@ -11,10 +16,10 @@ export async function fetchJobs() {
         keyword: 'developpeur'
       },
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'application/json'
       },
-      timeout: 10000
+      timeout: 25000
     });
     
     if (res.data && res.data.jobs) {

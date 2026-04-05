@@ -1,36 +1,53 @@
 /**
  * Parser pour Pyjama Jobs
- * Startups et culture tech
+ * API retourne du HTML au lieu de JSON - mode HTML via Cheerio
  */
 
-const PYJAMA_API = 'https://pyjamajobs.com/api/v1/jobs';
+import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
 
 export async function fetchJobs() {
+  const jobs = [];
+  const url = 'https://pyjamajobs.com/fr/offres-d-emploi/developpeur';
+
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    const res = await fetch(PYJAMA_API, { 
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Eric-Bot/1.0)', 'Accept': 'application/json' }
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+      }
     });
-    clearTimeout(timeoutId);
 
-    if (!res.ok) return [];
+    if (!response.ok) {
+      console.log('[Pyjama Jobs] Skipped - HTTP ' + response.status);
+      return jobs;
+    }
 
-    const data = await res.json();
-    return (data.offres || []).map(job => ({
-      title: job.titre,
-      company: job.entreprise,
-      location: job.ville || 'Remote',
-      url: job.lien,
-      source: 'Pyjama Jobs',
-      publishedAt: job.datePublication,
-      stack: job.stack || [],
-      type: job.typeContrat || 'CDI'
-    }));
-  } catch (e) {
-    console.error('Pyjama Jobs error:', e.message);
-    return [];
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Try various selectors for job cards
+    $('a[href*="/offre/"], .job-card, article').each((_, el) => {
+      const title = $(el).find('h2, h3, .job-title, .title').first().text().trim();
+      const company = $(el).find('.company, .employer, .org').first().text().trim();
+      const location = $(el).find('.location, .city, .place').first().text().trim();
+      const href = $(el).attr('href');
+
+      if (title && title.length > 3) {
+        jobs.push({
+          platform: 'pyjamajobs',
+          title,
+          company: company || 'Non spécifié',
+          location: location || 'France',
+          url: href && href.startsWith('http') ? href : (href ? `https://pyjamajobs.com${href}` : ''),
+          date: new Date().toISOString()
+        });
+      }
+    });
+
+    console.log(`[Pyjama Jobs] Found ${jobs.length} jobs`);
+  } catch (err) {
+    console.error('[Pyjama Jobs] Error:', err.message);
   }
+
+  return jobs;
 }
