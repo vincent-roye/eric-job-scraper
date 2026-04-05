@@ -3,14 +3,17 @@
  * Utilise le flux RSS pour les cadres
  */
 
-const APEC_RSS = 'https://www.apec.fr/rss-feed/offresdemploi?keywords=d%C3%A9veloppeur&selectedCategories=1';
+const APEC_RSS = 'https://www.apec.fr/rss-feed/offresdemploi?keywords=d%C3%A9veloppeur';
 
 export async function fetchJobs() {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(APEC_RSS, { signal: controller.signal });
+    const res = await fetch(APEC_RSS, { 
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Eric-Bot/1.0 (Job Scraper)' }
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) return [];

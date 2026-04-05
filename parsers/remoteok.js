@@ -28,7 +28,7 @@ export async function fetchJobs() {
       location: job.location || 'Remote',
       url: job.url,
       source: 'RemoteOK',
-      publishedAt: new Date(job.date * 1000).toISOString(),
+      publishedAt: job.date ? new Date(job.date * 1000).toISOString() : new Date().toISOString(),
       stack: job.tags ? job.tags.map(t => t.name) : [],
       type: 'Remote'
     })).filter(j => j.title && j.url);
