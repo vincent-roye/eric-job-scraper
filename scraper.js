@@ -3,7 +3,7 @@
  * Orchestre la récupération, le filtrage et la sauvegarde des offres.
  */
 
-import { getDb, saveJob, getJobCount } from './db.js';
+import { saveJob, getJobCount } from './db.js';
 import * as parsers from './parsers/index.js';
 
 // Mots-clés pour filtrer les offres "Tech"
@@ -20,7 +20,6 @@ function isTechJob(title, stack) {
 
 export async function runScraper() {
   console.log('🚀 Démarrage du scraper Éric...');
-  const db = await getDb();
   
   let totalFound = 0;
   let totalSaved = 0;
