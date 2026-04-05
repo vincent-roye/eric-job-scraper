@@ -3,14 +3,17 @@
  * Startups et culture tech
  */
 
-const PYJAMA_API = 'https://pyjamajobs.com/api/v1/offres';
+const PYJAMA_API = 'https://pyjamajobs.com/api/v1/jobs';
 
 export async function fetchJobs() {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(PYJAMA_API, { signal: controller.signal });
+    const res = await fetch(PYJAMA_API, { 
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Eric-Bot/1.0)', 'Accept': 'application/json' }
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) return [];

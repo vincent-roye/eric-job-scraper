@@ -10,7 +10,10 @@ export async function fetchJobs() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const res = await fetch(LESTALENTS_RSS, { signal: controller.signal });
+    const res = await fetch(LESTALENTS_RSS, { 
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Eric-Bot/1.0)' }
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) return [];

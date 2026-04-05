@@ -12,7 +12,10 @@ export async function fetchJobs() {
 
     const res = await fetch(APEC_RSS, { 
       signal: controller.signal,
-      headers: { 'User-Agent': 'Eric-Bot/1.0 (Job Scraper)' }
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/rss+xml'
+      }
     });
     clearTimeout(timeoutId);
 
