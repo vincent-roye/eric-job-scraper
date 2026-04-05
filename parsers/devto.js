@@ -1,13 +1,12 @@
-import * as cheerio from 'cheerio';
-
 /**
  * Parser pour Dev.to Jobs
- * Communauté développeurs - offres tech
+ * Utilise l'API Dev.to pour récupérer les posts taggés "hiring"
  */
 
 export async function fetchJobs() {
   const jobs = [];
-  const url = 'https://dev.to/jobs';
+  // On utilise l'API Dev.to pour les posts taggés "hiring"
+  const url = 'https://dev.to/api/articles?tag=hiring&page=1&per_page=30';
 
   try {
     const controller = new AbortController();
@@ -16,8 +15,8 @@ export async function fetchJobs() {
     const res = await fetch(url, { 
       signal: controller.signal,
       headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+        'Accept': 'application/json'
       }
     });
     clearTimeout(timeoutId);
@@ -27,29 +26,30 @@ export async function fetchJobs() {
       return jobs;
     }
 
-    const html = await res.text();
-    const $ = cheerio.load(html);
+    const data = await res.json();
+    const articles = Array.isArray(data) ? data : [];
 
-    $('.crayons-card').each((_, el) => {
-      const title = $(el).find('h3 a').first().text().trim();
-      const company = $(el).find('.crayons-subtitle-3').first().text().trim();
-      const location = $(el).find('.crayons-tag__body').first().text().trim();
-      const link = $(el).find('h3 a').attr('href');
+    for (const article of articles) {
+      const title = article.title || '';
+      const author = article.user?.name || 'Non spécifié';
+      const publishedAt = article.published_at || new Date().toISOString();
+      const url = article.url || '';
+      const tags = article.tag_list || [];
 
-      if (title && title.length > 3) {
+      if (title && title.length > 5) {
         jobs.push({
           platform: 'devto',
           title,
-          company: company || 'Non spécifié',
-          location: location || 'Remote',
-          url: link && link.startsWith('http') ? link : `https://dev.to${link}`,
+          company: author,
+          location: tags.includes('remote') ? 'Remote' : 'Non spécifié',
+          url,
           source: 'Dev.to',
-          publishedAt: new Date().toISOString(),
-          stack: [],
+          publishedAt,
+          stack: tags.filter(t => t !== 'hiring' && t !== 'remote'),
           type: 'Full-time'
         });
       }
-    });
+    }
 
     console.log(`[Dev.to] Found ${jobs.length} jobs`);
   } catch (e) {

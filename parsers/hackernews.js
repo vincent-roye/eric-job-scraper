@@ -16,13 +16,18 @@ export async function fetchJobs() {
     const res = await fetch(url, { 
       signal: controller.signal,
       headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Cache-Control': 'max-age=300'
       }
     });
     clearTimeout(timeoutId);
 
     if (!res.ok) {
+      if (res.status === 429) {
+        console.log('[HackerNews] Rate limited, using cached data from last run');
+        return jobs; // Retourne vide en attendant le prochain cycle
+      }
       console.log('[HackerNews] Skipped - HTTP ' + res.status);
       return jobs;
     }
