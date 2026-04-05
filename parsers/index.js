@@ -20,3 +20,6 @@ export { fetchJobs as fetchViteajobJobs } from './viteajob.js';
 export { fetchJobs as fetchIndeedJobs } from './indeed.js';
 export { fetchJobs as fetchLinkedInJobs } from './linkedin.js';
 export { fetchJobs as fetchFranceTravailJobs } from './francetravail.js';
+export { fetchJobs as fetchGlassdoorJobs } from './glassdoor.js';
+export { fetchJobs as fetchRegionalJobJobs } from './regionaljob.js';
+export { fetchJobs as fetchJobinjaJobs } from './jobinja.js';
