@@ -46,3 +46,7 @@ export async function saveJob(job) {
 export async function getJobCount() {
   return countStmt.get().count;
 }
+
+export async function getDb() {
+  return _db;
+}

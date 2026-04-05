@@ -16,12 +16,12 @@ export async function fetchJobs() {
     if (!res.ok) return [];
 
     const text = await res.text();
-    const items = text.match(/<item>.*?</item>/gs) || [];
+    const items = text.match(/<item>.*?<\/item>/gs) || [];
 
     return items.map(item => {
-      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]></title>/)?.[1] || '';
-      const link = item.match(/<link>(.*?)</link>/)?.[1] || '';
-      const pubDate = item.match(/<pubDate>(.*?)</pubDate>/)?.[1] || '';
+      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || '';
+      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || '';
+      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
       
       return {
         title: title,

@@ -55,7 +55,7 @@ export async function runScraper() {
   console.log('💾 Génération de l\'export JSON...');
   try {
     const db = await getDb();
-    const allJobs = await db.all('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 50');
+    const allJobs = db.prepare('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 50').all();
     await fs.writeFile('latest_jobs.json', JSON.stringify(allJobs, null, 2));
     console.log('✅ latest_jobs.json généré avec les 50 dernières offres.');
   } catch (e) {
