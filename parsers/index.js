@@ -40,3 +40,6 @@ export { fetchJobs as fetchJobgetherJobs } from './jobgether.js';
 export { fetchJobs as fetchTalentioJobs } from './talentio.js';
 export { fetchJobs as fetchFreelanceInfoJobs } from './freelanceinfo.js';
 export { fetchJobs as fetchGoJobs } from './gojobs.js';
+export { fetchJobs as fetchWeLoveDevsJobs } from './welovedevs.js';
+export { fetchJobs as fetchChooseYourBossJobs } from './chooseyourboss.js';
+export { fetchJobs as fetchJobijobaJobs } from './jobijoba.js';
