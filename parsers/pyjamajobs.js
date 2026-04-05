@@ -1,52 +1,58 @@
 /**
  * Parser pour Pyjama Jobs
- * API retourne du HTML au lieu de JSON - mode HTML via Cheerio
+ * Startups et scale-ups en Europe
  */
 
-import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
 export async function fetchJobs() {
   const jobs = [];
-  const url = 'https://pyjamajobs.com/fr/offres-d-emploi/developpeur';
+  const url = 'https://pyjama.io/jobs?location=France';
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const res = await fetch(url, { 
+      signal: controller.signal,
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml'
       }
     });
+    clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      console.log('[Pyjama Jobs] Skipped - HTTP ' + response.status);
+    if (!res.ok) {
+      console.log('[Pyjama Jobs] Skipped - HTTP ' + res.status);
       return jobs;
     }
 
-    const html = await response.text();
+    const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Try various selectors for job cards
-    $('a[href*="/offre/"], .job-card, article').each((_, el) => {
-      const title = $(el).find('h2, h3, .job-title, .title').first().text().trim();
-      const company = $(el).find('.company, .employer, .org').first().text().trim();
-      const location = $(el).find('.location, .city, .place').first().text().trim();
+    // Pyjama utilise souvent des composants React, on cherche les liens jobs
+    $('a[href^="/job/"]').each((_, el) => {
+      const title = $(el).text().trim();
       const href = $(el).attr('href');
-
-      if (title && title.length > 3) {
+      
+      if (title && title.length > 5 && href) {
         jobs.push({
-          platform: 'pyjamajobs',
+          platform: 'pyjama',
           title,
-          company: company || 'Non spécifié',
-          location: location || 'France',
-          url: href && href.startsWith('http') ? href : (href ? `https://pyjamajobs.com${href}` : ''),
-          date: new Date().toISOString()
+          company: 'Pyjama',
+          location: 'France',
+          url: `https://pyjama.io${href}`,
+          source: 'Pyjama Jobs',
+          publishedAt: new Date().toISOString(),
+          stack: [],
+          type: 'Full-time'
         });
       }
     });
 
     console.log(`[Pyjama Jobs] Found ${jobs.length} jobs`);
-  } catch (err) {
-    console.error('[Pyjama Jobs] Error:', err.message);
+  } catch (e) {
+    console.error('[Pyjama Jobs] Error:', e.message);
   }
 
   return jobs;

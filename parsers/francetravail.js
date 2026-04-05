@@ -4,15 +4,21 @@ const BASE_URL = 'https://candidat.francetravail.fr/offres/recherche';
 
 export async function fetchJobs({ keywords = 'développeur', location = 'Paris' } = {}) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     const searchUrl = `${BASE_URL}?motsCles=${encodeURIComponent(keywords)}&lieu=${encodeURIComponent(location)}`;
     const response = await fetch(searchUrl, {
+      signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
       }
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`FranceTravail HTTP ${response.status}`);
+      console.log('[FranceTravail] Skipped - HTTP ' + response.status);
+      return [];
     }
 
     const html = await response.text();
@@ -31,14 +37,19 @@ export async function fetchJobs({ keywords = 'développeur', location = 'Paris' 
           title: titleEl.text().trim(),
           url: linkEl.attr('href') || null,
           company: companyEl.text().trim(),
-          location: locationEl.text().trim()
+          location: locationEl.text().trim(),
+          source: 'France Travail',
+          publishedAt: new Date().toISOString(),
+          stack: [],
+          type: 'CDI'
         });
       }
     });
 
+    console.log(`[FranceTravail] Found ${jobs.length} jobs`);
     return jobs;
   } catch (err) {
-    console.error(`FranceTravail parser error: ${err.message}`);
+    console.error('[FranceTravail] Error:', err.message);
     return [];
   }
 }

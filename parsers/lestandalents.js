@@ -3,7 +3,6 @@
  * Jobs tech et IT en France
  */
 
-import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
 export async function fetchJobs() {
@@ -11,21 +10,25 @@ export async function fetchJobs() {
   const url = 'https://www.espace-talents.fr/offre-emploi';
 
   try {
-    const response = await fetch(url, {
-      headers: {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const res = await fetch(url, { 
+      signal: controller.signal,
+      headers: { 
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
+    clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      console.log('[Les Talents] Skipped - HTTP ' + response.status);
+    if (!res.ok) {
+      console.log('[Les Talents] Skipped - HTTP ' + res.status);
       return jobs;
     }
 
-    const html = await response.text();
+    const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Parse job listings from cards
     $('.offre-card, article.offre, .job-item').each((_, el) => {
       const title = $(el).find('h2, h3, .titre, .job-title').first().text().trim();
       const company = $(el).find('.entreprise, .company, .societe').first().text().trim();
@@ -39,7 +42,10 @@ export async function fetchJobs() {
           company: company || 'Non spécifié',
           location: location || 'France',
           url: href ? (href.startsWith('http') ? href : `https://www.espace-talents.fr${href}`) : '',
-          date: new Date().toISOString()
+          source: 'Les Talents',
+          publishedAt: new Date().toISOString(),
+          stack: [],
+          type: 'Full-time'
         });
       }
     });

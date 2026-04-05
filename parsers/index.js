@@ -28,3 +28,8 @@ export { fetchJobs as fetchHackerNewsJobs } from './hackernews.js';
 export { fetchJobs as fetchCadremploiJobs } from './cadremploi.js';
 export { fetchJobs as fetchLeFigaroEmploiJobs } from './lefigaroemploi.js';
 export { fetchJobs as fetchCareerBuilderJobs } from './careerbuilder.js';
+export { fetchJobs as fetchJobsBoardJobs } from './jobsboard.js';
+export { fetchJobs as fetchStackOverflowJobs } from './stackoverflowjobs.js';
+export { fetchJobs as fetchSimplyHiredJobs } from './simplyhired.js';
+export { fetchJobs as fetchGitHubJobs } from './githubjobs.js';
+export { fetchJobs as fetchRedditJobs } from './redditjobs.js';

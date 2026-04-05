@@ -1,44 +1,50 @@
 /**
- * Parser pour Free-Work
- * Utilise le flux XML public
- * Focus: IT & Freelance
+ * Parser pour FreeWork
+ * Utilise l'API JSON interne ou le flux RSS si disponible.
  */
 
-const FREEWORK_XML = 'https://free-work.com/offres.xml';
-
 export async function fetchJobs() {
+  const jobs = [];
+  const url = 'https://freework.fr/api/jobs?search=dev&per_page=20';
+
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(FREEWORK_XML, { signal: controller.signal });
+    const res = await fetch(url, { 
+      signal: controller.signal,
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json'
+      }
+    });
     clearTimeout(timeoutId);
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.log('[FreeWork] Skipped - HTTP ' + res.status);
+      return jobs;
+    }
 
-    const text = await res.text();
-    const items = text.match(/<offre>.*?<\/offre>/gs) || [];
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : (data.data || []);
 
-    return items.map(item => {
-      const title = item.match(/<titre><!\[CDATA\[(.*?)\]\]><\/titre>/)?.[1] || '';
-      const company = item.match(/<societe><!\[CDATA\[(.*?)\]\]><\/societe>/)?.[1] || '';
-      const link = item.match(/<url><!\[CDATA\[(.*?)\]\]><\/url>/)?.[1] || '';
-      const date = item.match(/<date>(.*?)<\/date>/)?.[1] || '';
-      const location = item.match(/<lieu><!\[CDATA\[(.*?)\]\]><\/lieu>/)?.[1] || 'Remote';
-
-      return {
-        title: title,
-        company: company,
-        location: location,
-        url: link,
-        source: 'Free-Work',
-        publishedAt: date,
-        stack: [], // Stack souvent dans la description
+    items.forEach(job => {
+      jobs.push({
+        title: job.title || job.name || '',
+        company: job.company || 'Freelance',
+        location: job.location || 'France',
+        url: job.url || `https://freework.fr/job/${job.id}`,
+        source: 'FreeWork',
+        publishedAt: job.created_at || new Date().toISOString(),
+        stack: job.stack || [],
         type: 'Freelance'
-      };
-    }).filter(j => j.url);
+      });
+    });
+
+    console.log(`[FreeWork] Found ${jobs.length} jobs`);
   } catch (e) {
-    console.error('Free-Work error:', e.message);
-    return [];
+    console.error('[FreeWork] Error:', e.message);
   }
+
+  return jobs;
 }

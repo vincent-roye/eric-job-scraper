@@ -1,11 +1,13 @@
+import * as cheerio from 'cheerio';
+
 /**
  * Parser pour Dev.to Jobs
- * Flux RSS des offres tech
+ * Communauté développeurs - offres tech
  */
 
 export async function fetchJobs() {
   const jobs = [];
-  const url = 'https://dev.to/feed/tag/hiring';
+  const url = 'https://dev.to/jobs';
 
   try {
     const controller = new AbortController();
@@ -15,7 +17,7 @@ export async function fetchJobs() {
       signal: controller.signal,
       headers: { 
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/rss+xml, application/xml, text/xml'
+        'Accept': 'text/html,application/xhtml+xml'
       }
     });
     clearTimeout(timeoutId);
@@ -25,29 +27,29 @@ export async function fetchJobs() {
       return jobs;
     }
 
-    const text = await res.text();
-    const items = text.match(/<item>.*?<\/item>/gs) || [];
+    const html = await res.text();
+    const $ = cheerio.load(html);
 
-    for (const item of items.slice(0, 20)) {
-      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || 
-                    item.match(/<title>(.*?)<\/title>/)?.[1] || '';
-      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || '';
-      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
-      const description = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] || 
-                         item.match(/<description>(.*?)<\/description>/)?.[1] || '';
+    $('.crayons-card').each((_, el) => {
+      const title = $(el).find('h3 a').first().text().trim();
+      const company = $(el).find('.crayons-subtitle-3').first().text().trim();
+      const location = $(el).find('.crayons-tag__body').first().text().trim();
+      const link = $(el).find('h3 a').attr('href');
 
-      if (title && link) {
+      if (title && title.length > 3) {
         jobs.push({
           platform: 'devto',
-          title: title.trim(),
-          company: 'Dev.to Community',
-          location: 'Remote/Various',
-          url: link.trim(),
-          date: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-          description: description.replace(/<[^>]*>/g, '').substring(0, 500)
+          title,
+          company: company || 'Non spécifié',
+          location: location || 'Remote',
+          url: link && link.startsWith('http') ? link : `https://dev.to${link}`,
+          source: 'Dev.to',
+          publishedAt: new Date().toISOString(),
+          stack: [],
+          type: 'Full-time'
         });
       }
-    }
+    });
 
     console.log(`[Dev.to] Found ${jobs.length} jobs`);
   } catch (e) {

@@ -13,13 +13,16 @@ export async function fetchJobs() {
     const res = await fetch(APEC_RSS, { 
       signal: controller.signal,
       headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'application/rss+xml'
       }
     });
     clearTimeout(timeoutId);
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.log('[APEC] Skipped - HTTP ' + res.status);
+      return [];
+    }
 
     const text = await res.text();
     const items = text.match(/<item>.*?<\/item>/gs) || [];
@@ -29,11 +32,8 @@ export async function fetchJobs() {
       const link = item.match(/<link>(.*?)<\/link>/)?.[1] || '';
       const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
       
-      // APEC met souvent "H/F" à la fin, on nettoie
-      const cleanTitle = title.replace(/ F\/H$/, '').replace(/ H\/F$/, '');
-
       return {
-        title: cleanTitle,
+        title: title.replace(/ F\/H$/, '').trim(),
         company: 'APEC',
         location: 'France',
         url: link,
@@ -44,7 +44,7 @@ export async function fetchJobs() {
       };
     }).filter(j => j.url);
   } catch (e) {
-    console.error('APEC error:', e.message);
+    console.error('[APEC] Error:', e.message);
     return [];
   }
 }
