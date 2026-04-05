@@ -14,3 +14,6 @@ export { fetchJobs as fetchStartupJobsJobs } from './startupjobs.js';
 export { fetchJobs as fetchLesJeudisJobs } from './lesjeudis.js';
 export { fetchJobs as fetchRegionJobJobs } from './regionjob.js';
 export { fetchJobs as fetchMonsterJobs } from './monster.js';
+export { fetchJobs as fetchEmploiticJobs } from './emploitic.js';
+export { fetchJobs as fetchKeljobJobs } from './keljob.js';
+export { fetchJobs as fetchViteajobJobs } from './viteajob.js';
