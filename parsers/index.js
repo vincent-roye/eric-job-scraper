@@ -23,3 +23,8 @@ export { fetchJobs as fetchFranceTravailJobs } from './francetravail.js';
 export { fetchJobs as fetchGlassdoorJobs } from './glassdoor.js';
 export { fetchJobs as fetchRegionalJobJobs } from './regionaljob.js';
 export { fetchJobs as fetchJobinjaJobs } from './jobinja.js';
+export { fetchJobs as fetchDevToJobs } from './devto.js';
+export { fetchJobs as fetchHackerNewsJobs } from './hackernews.js';
+export { fetchJobs as fetchCadremploiJobs } from './cadremploi.js';
+export { fetchJobs as fetchLeFigaroEmploiJobs } from './lefigaroemploi.js';
+export { fetchJobs as fetchCareerBuilderJobs } from './careerbuilder.js';
