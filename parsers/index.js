@@ -5,3 +5,6 @@ export { fetchJobs as fetchRemoteOKJobs } from './remoteok.js';
 export { fetchJobs as fetchApecJobs } from './apec.js';
 export { fetchJobs as fetchJobTeaserJobs } from './jobteaser.js';
 export { fetchJobs as fetchHelloworkJobs } from './hellowork.js';
+export { fetchJobs as fetchJoblistJobs } from './joblist.js';
+export { fetchJobs as fetchPyjamaJobsJobs } from './pyjamajobs.js';
+export { fetchJobs as fetchMeteojobJobs } from './meteojob.js';
