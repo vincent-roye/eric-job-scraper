@@ -8,3 +8,6 @@ export { fetchJobs as fetchHelloworkJobs } from './hellowork.js';
 export { fetchJobs as fetchJoblistJobs } from './joblist.js';
 export { fetchJobs as fetchPyjamaJobsJobs } from './pyjamajobs.js';
 export { fetchJobs as fetchMeteojobJobs } from './meteojob.js';
+export { fetchJobs as fetchLesTalentsJobs } from './lestandalents.js';
+export { fetchJobs as fetchCadreoJobs } from './cadreo.js';
+export { fetchJobs as fetchStartupJobsJobs } from './startupjobs.js';
