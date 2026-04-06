@@ -1,0 +1,993 @@
+{
+  "generatedAt": "2026-04-06T12:28:04.152Z",
+  "mode": "max-platforms-v4",
+  "summary": {
+    "parserCount": 48,
+    "successCount": 7,
+    "totalFound": 185,
+    "skippedInvalid": 0,
+    "techRejected": 45,
+    "duplicateCount": 0,
+    "totalSaved": 140,
+    "franceCandidates": 17,
+    "dbCount": 151
+  },
+  "sourceHealth": [
+    {
+      "parser": "FranceTravailJobs",
+      "status": "ok",
+      "found": 60,
+      "saved": 51,
+      "efficiency": 0.85
+    },
+    {
+      "parser": "DevToJobs",
+      "status": "ok",
+      "found": 25,
+      "saved": 24,
+      "efficiency": 0.96
+    },
+    {
+      "parser": "RemoteOKJobs",
+      "status": "ok",
+      "found": 30,
+      "saved": 24,
+      "efficiency": 0.8
+    },
+    {
+      "parser": "GitHubJobs",
+      "status": "ok",
+      "found": 20,
+      "saved": 13,
+      "efficiency": 0.65
+    },
+    {
+      "parser": "HackerNewsJobs",
+      "status": "ok",
+      "found": 10,
+      "saved": 10,
+      "efficiency": 1
+    },
+    {
+      "parser": "RemotiveJobs",
+      "status": "ok",
+      "found": 20,
+      "saved": 10,
+      "efficiency": 0.5
+    },
+    {
+      "parser": "RedditJobs",
+      "status": "ok",
+      "found": 20,
+      "saved": 8,
+      "efficiency": 0.4
+    },
+    {
+      "parser": "ApecJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "CadremploiJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "CadreoJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "CareerBuilderJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "ChooseYourBossJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "DjangoJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "EmploiticJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "FreeWorkJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "FreelanceInfoJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "GlassdoorJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "GoJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "HelloworkJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "IndeedJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JobTeaserJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JobgetherJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JobijobaJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JobinjaJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JoblistJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "JobsBoardJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "KeljobJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "LeFigaroEmploiJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "LesJeudisJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "LesTalentsJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "LinkedInJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "MeteojobJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "MonsterJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "NHRemoteJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "PyjamaJobsJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "PythonJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "RegionJobJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "RegionalJobJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "Remote3Jobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "RemoteWorkJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "RubyOnRailsJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "SimplyHiredJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "StackOverflowJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "StartupJobsJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "TalentioJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "ViteajobJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "WeLoveDevsJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "WelcomeToTheJungleJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    }
+  ],
+  "parsers": [
+    {
+      "parser": "ApecJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "CadremploiJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "CadreoJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "CareerBuilderJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "ChooseYourBossJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "DevToJobs",
+      "found": 25,
+      "saved": 24,
+      "invalid": 0,
+      "techFilteredOut": 1,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "DjangoJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "EmploiticJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "FranceTravailJobs",
+      "found": 60,
+      "saved": 51,
+      "invalid": 0,
+      "techFilteredOut": 9,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "FreeWorkJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "FreelanceInfoJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "GitHubJobs",
+      "found": 20,
+      "saved": 13,
+      "invalid": 0,
+      "techFilteredOut": 7,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "GlassdoorJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "GoJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "HackerNewsJobs",
+      "found": 10,
+      "saved": 10,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "HelloworkJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "IndeedJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JobTeaserJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JobgetherJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JobijobaJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JobinjaJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JoblistJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "JobsBoardJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "KeljobJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "LeFigaroEmploiJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "LesJeudisJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "LesTalentsJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "LinkedInJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "MeteojobJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "MonsterJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "NHRemoteJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "PyjamaJobsJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "PythonJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "RedditJobs",
+      "found": 20,
+      "saved": 8,
+      "invalid": 0,
+      "techFilteredOut": 12,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "RegionJobJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "RegionalJobJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "Remote3Jobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "RemoteOKJobs",
+      "found": 30,
+      "saved": 24,
+      "invalid": 0,
+      "techFilteredOut": 6,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "RemoteWorkJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "RemotiveJobs",
+      "found": 20,
+      "saved": 10,
+      "invalid": 0,
+      "techFilteredOut": 10,
+      "duplicates": 0,
+      "status": "ok"
+    },
+    {
+      "parser": "RubyOnRailsJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "SimplyHiredJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "StackOverflowJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "StartupJobsJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "TalentioJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "ViteajobJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "WeLoveDevsJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    },
+    {
+      "parser": "WelcomeToTheJungleJobs",
+      "found": 0,
+      "saved": 0,
+      "invalid": 0,
+      "techFilteredOut": 0,
+      "duplicates": 0,
+      "status": "empty"
+    }
+  ],
+  "franceTop": [
+    {
+      "title": "Lead développeur NodeJS / Angular (H/F)",
+      "company": "SIMPLICITI",
+      "location": "69 - Lyon 6e Arrondissement",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LXJD",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.646Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 3
+    },
+    {
+      "title": "Développeur Java Spring Boot (H/F)",
+      "company": "WIZBII",
+      "location": "69 - Lyon 1er Arrondissement",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQMD",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.647Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 3
+    },
+    {
+      "title": "DÉVELOPPEUR BACKEND C++ (H/F)",
+      "company": "SEGMENT ELITE",
+      "location": "75 - PARIS",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JNTG",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.051Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 3
+    },
+    {
+      "title": "Développeur-se Back-end Python H/F (H/F)",
+      "company": "OCTOPUS ENERGY FRANCE",
+      "location": "75 - PARIS 02",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GZXK",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.052Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 8,
+      "techScore": 2
+    },
+    {
+      "title": "Developpeur React Native (H/F)",
+      "company": "Kent",
+      "location": "75 - Paris 11e Arrondissement",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206MCWX",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.645Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur Back-End .NET (H/F)",
+      "company": "SEGMENT ELITE",
+      "location": "75 - PARIS",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206MBRY",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.646Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur React (H/F)",
+      "company": "WIZBII",
+      "location": "69 - Lyon 1er Arrondissement",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQRT",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.647Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur Python Expert en Supervision Réseau (H/F)",
+      "company": "SEGMENT ELITE",
+      "location": "75 - PARIS",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JPDC",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.051Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur React Native Junior (H/F)",
+      "company": "INFORMATIS TECHNOLOGY SYSTM",
+      "location": "44 - Nantes",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FFMF",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.423Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur React Native Senior (H/F)",
+      "company": "INFORMATIS TECHNOLOGY SYSTM",
+      "location": "44 - Nantes",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FFFH",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.423Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 2
+    },
+    {
+      "title": "Développeur (H/F)",
+      "company": "WIZBII",
+      "location": "69 - Lyon 1er Arrondissement",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQXQ",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.647Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 1
+    },
+    {
+      "title": "Développeur Applicatif (H/F)",
+      "company": "CREATIVE INFORMATION TECHNOLOGY",
+      "location": "69 - LYON 09",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206KRCG",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:53.648Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 1
+    },
+    {
+      "title": "Développeur ServiceNow - IA / ITSM (H/F)",
+      "company": "INFORMATIS TECHNOLOGY SYSTM",
+      "location": "75 - PARIS",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GLCR",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.422Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 1
+    },
+    {
+      "title": "Développeur ServiceNow HRSD (H/F)",
+      "company": "INFORMATIS TECHNOLOGY SYSTM",
+      "location": "75 - Paris",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GKBD",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.422Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 1
+    },
+    {
+      "title": "concepteur développeur en alternance (H/F)",
+      "company": "CAISSE PRIMAIRE ASSURANCE MALADIE",
+      "location": "33 - BORDEAUX",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FBRZ",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.423Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 7,
+      "techScore": 1
+    },
+    {
+      "title": "Développeur Sénior - Full English & Full Remote (H/F)",
+      "company": "INFORMATIS TECHNOLOGY SYSTM",
+      "location": "Île-de-France",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JYVY",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.051Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 6,
+      "techScore": 1
+    },
+    {
+      "title": "Développeur fullstack (H/F)",
+      "company": "FRANCE DETECTION SERVICES",
+      "location": "84 - LE THOR",
+      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206HLRV",
+      "source": "France Travail",
+      "publishedAt": "2026-04-06T12:26:54.052Z",
+      "stack": [],
+      "type": "CDI",
+      "franceScore": 1,
+      "techScore": 2
+    }
+  ]
+}

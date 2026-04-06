@@ -1,0 +1,338 @@
+[
+  {
+    "parser": "FranceTravailJobs",
+    "status": "ok",
+    "found": 60,
+    "saved": 51,
+    "efficiency": 0.85
+  },
+  {
+    "parser": "DevToJobs",
+    "status": "ok",
+    "found": 25,
+    "saved": 24,
+    "efficiency": 0.96
+  },
+  {
+    "parser": "RemoteOKJobs",
+    "status": "ok",
+    "found": 30,
+    "saved": 24,
+    "efficiency": 0.8
+  },
+  {
+    "parser": "GitHubJobs",
+    "status": "ok",
+    "found": 20,
+    "saved": 13,
+    "efficiency": 0.65
+  },
+  {
+    "parser": "HackerNewsJobs",
+    "status": "ok",
+    "found": 10,
+    "saved": 10,
+    "efficiency": 1
+  },
+  {
+    "parser": "RemotiveJobs",
+    "status": "ok",
+    "found": 20,
+    "saved": 10,
+    "efficiency": 0.5
+  },
+  {
+    "parser": "RedditJobs",
+    "status": "ok",
+    "found": 20,
+    "saved": 8,
+    "efficiency": 0.4
+  },
+  {
+    "parser": "ApecJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "CadremploiJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "CadreoJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "CareerBuilderJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "ChooseYourBossJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "DjangoJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "EmploiticJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "FreeWorkJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "FreelanceInfoJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "GlassdoorJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "GoJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "HelloworkJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "IndeedJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JobTeaserJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JobgetherJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JobijobaJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JobinjaJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JoblistJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "JobsBoardJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "KeljobJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "LeFigaroEmploiJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "LesJeudisJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "LesTalentsJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "LinkedInJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "MeteojobJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "MonsterJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "NHRemoteJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "PyjamaJobsJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "PythonJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "RegionJobJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "RegionalJobJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "Remote3Jobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "RemoteWorkJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "RubyOnRailsJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "SimplyHiredJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "StackOverflowJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "StartupJobsJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "TalentioJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "ViteajobJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "WeLoveDevsJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "WelcomeToTheJungleJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  }
+]

@@ -1,10 +1,5 @@
 /**
  * Parser pour Hellowork
- * L'API semble avoir changé ou bloque les requêtes anonymes.
+ * Bloque les requêtes anonymes. Désactivé.
  */
-
-export async function fetchJobs() {
-  const jobs = [];
-  console.log('[Hellowork] Skipped - API returned 405/404');
-  return jobs;
-}
+export async function fetchJobs() { return []; }

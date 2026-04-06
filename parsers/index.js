@@ -43,3 +43,6 @@ export { fetchJobs as fetchGoJobs } from './gojobs.js';
 export { fetchJobs as fetchWeLoveDevsJobs } from './welovedevs.js';
 export { fetchJobs as fetchChooseYourBossJobs } from './chooseyourboss.js';
 export { fetchJobs as fetchJobijobaJobs } from './jobijoba.js';
+export { fetchJobs as fetchRemote3Jobs } from './remote3.js';
+export { fetchJobs as fetchNHRemoteJobs } from './nhremote.js';
+export { fetchJobs as fetchRemoteWorkJobs } from './remotework.js';
