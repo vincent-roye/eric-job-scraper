@@ -1,23 +1,16 @@
+import { safeFetch } from './utils.js';
+
 /**
  * Parser pour Jobgether
- * Agrégateur d'offres remote internationales
  */
 
-const JOBTIGHER_API = 'https://jobgether.co/api/public/v1/jobs?limit=30&offset=0';
+const JOBGETHER_API = 'https://jobgether.com/api/public/v1/jobs?limit=30&offset=0';
 
 export async function fetchJobs() {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    const res = await fetch(JOBTIGHER_API, { 
-      signal: controller.signal,
-      headers: { 
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0'
-      }
-    });
-    clearTimeout(timeoutId);
+    const res = await safeFetch(JOBGETHER_API, {
+      headers: { 'Accept': 'application/json' }
+    }, 15000);
 
     if (!res.ok) {
       console.log('[Jobgether] Skipped - HTTP ' + res.status);
@@ -25,18 +18,21 @@ export async function fetchJobs() {
     }
 
     const data = await res.json();
-    const jobs = (data.jobs || []);
+    const jobs = Array.isArray(data.jobs) ? data.jobs : [];
 
-    return jobs.map(job => ({
+    const normalized = jobs.map(job => ({
       title: job.title || '',
       company: job.company?.name || 'Entreprise',
       location: job.remote ? 'Remote' : (job.location || 'N/A'),
-      url: job.url || (`https://jobgether.co/jobs/${job.id}` || ''),
+      url: job.url || (job.id ? `https://jobgether.com/jobs/${job.id}` : ''),
       source: 'Jobgether',
       publishedAt: job.published_at || new Date().toISOString(),
-      stack: job.tags || job.skills || [],
+      stack: Array.isArray(job.tags) ? job.tags : (Array.isArray(job.skills) ? job.skills : []),
       type: job.job_type || 'Full-time'
     })).filter(j => j.title && j.url);
+
+    console.log(`[Jobgether] Found ${normalized.length} jobs`);
+    return normalized;
   } catch (e) {
     console.error('[Jobgether] Error:', e.message);
     return [];

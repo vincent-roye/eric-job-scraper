@@ -1,20 +1,12 @@
 import * as cheerio from 'cheerio';
+import { safeFetch } from './utils.js';
 
 const BASE_URL = 'https://candidat.francetravail.fr/offres/recherche';
 
 export async function fetchJobs({ keywords = 'développeur', location = 'Paris' } = {}) {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
     const searchUrl = `${BASE_URL}?motsCles=${encodeURIComponent(keywords)}&lieu=${encodeURIComponent(location)}`;
-    const response = await fetch(searchUrl, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-      }
-    });
-    clearTimeout(timeoutId);
+    const response = await safeFetch(searchUrl, {}, 15000);
 
     if (!response.ok) {
       console.log('[FranceTravail] Skipped - HTTP ' + response.status);
@@ -30,12 +22,13 @@ export async function fetchJobs({ keywords = 'développeur', location = 'Paris' 
       const companyEl = $(el).find('.entreprise');
       const locationEl = $(el).find('.lieu-travail');
       const linkEl = $(el).find('a.resultat-link');
+      const href = linkEl.attr('href') || '';
 
-      if (titleEl.length) {
+      if (titleEl.length && href) {
         jobs.push({
           platform: 'francetravail',
           title: titleEl.text().trim(),
-          url: linkEl.attr('href') || null,
+          url: href.startsWith('http') ? href : `https://candidat.francetravail.fr${href}`,
           company: companyEl.text().trim(),
           location: locationEl.text().trim(),
           source: 'France Travail',
