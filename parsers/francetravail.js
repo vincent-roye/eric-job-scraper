@@ -17,20 +17,21 @@ export async function fetchJobs({ keywords = 'développeur', location = 'Paris' 
     const $ = cheerio.load(html);
     const jobs = [];
 
-    $('.results-pe .offre').each((_, el) => {
-      const titleEl = $(el).find('.intitule');
-      const companyEl = $(el).find('.entreprise');
-      const locationEl = $(el).find('.lieu-travail');
-      const linkEl = $(el).find('a.resultat-link');
+    $('.result').each((_, el) => {
+      const root = $(el);
+      const linkEl = root.find('a[href*="/offres/recherche/detail/"]').first();
+      const title = root.find('.media-heading-title').first().text().trim() || root.find('h2').first().text().trim();
+      const company = root.find('.subtext').first().text().trim() || root.find('[itemprop="name"]').first().text().trim() || 'Non spécifié';
+      const locationText = root.find('.location').first().text().trim() || root.text().match(/Paris|Lyon|Marseille|Toulouse|Bordeaux|Lille|Nantes|Rennes|Strasbourg|Montpellier|Nice|Île-de-France|Ile-de-France/i)?.[0] || location;
       const href = linkEl.attr('href') || '';
 
-      if (titleEl.length && href) {
+      if (title && href) {
         jobs.push({
           platform: 'francetravail',
-          title: titleEl.text().trim(),
+          title,
           url: href.startsWith('http') ? href : `https://candidat.francetravail.fr${href}`,
-          company: companyEl.text().trim(),
-          location: locationEl.text().trim(),
+          company,
+          location: locationText || location,
           source: 'France Travail',
           publishedAt: new Date().toISOString(),
           stack: [],
