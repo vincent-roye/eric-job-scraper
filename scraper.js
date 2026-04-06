@@ -1,5 +1,5 @@
 /**
- * Moteur principal du scraper Éric - V3 France-only solide
+ * Moteur principal du scraper Éric - V4 max-platforms
  */
 
 import { saveJob, getJobCount, getDb } from './db.js';
@@ -12,20 +12,7 @@ const TECH_KEYWORDS = [
   'python', 'java', 'react', 'node', 'javascript', 'typescript', 'c#', 'ruby', 'go', 'rust',
   'cloud', 'aws', 'azure', 'docker', 'kubernetes', 'data', 'ai', 'machine learning', 'software',
   'web', 'mobile', 'ios', 'android', 'product engineer', 'sre', 'devops', 'qa', 'test automation',
-  '.net', 'php', 'angular', 'spring', 'full stack', 'frontend', 'backend', 'logiciel embarqué'
-];
-
-const FRANCE_PREFERRED_PARSERS = [
-  'fetchFranceTravailJobs',
-  'fetchChooseYourBossJobs',
-  'fetchWeLoveDevsJobs',
-  'fetchLesJeudisJobs',
-  'fetchJobTeaserJobs',
-  'fetchHelloworkJobs',
-  'fetchApecJobs',
-  'fetchTalentioJobs',
-  'fetchFreeWorkJobs',
-  'fetchLesTalentsJobs'
+  '.net', 'php', 'angular', 'spring', 'full stack', 'logiciel embarqué', 'c++'
 ];
 
 const NON_TECH_TITLE_PATTERNS = [
@@ -42,42 +29,61 @@ function isTechJob(title, stack) {
 function dedupeJobs(jobs) {
   const seen = new Set();
   const out = [];
-
   for (const job of jobs) {
     const key = [job.url, job.title.toLowerCase(), job.company.toLowerCase()].join('::');
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(job);
   }
-
   return out;
 }
 
-export async function runScraper({ preferredOnly = true } = {}) {
-  console.log('🇫🇷 Démarrage du scraper Éric France-only V3...');
+function franceScore(job) {
+  let score = 0;
+  const title = (job.title || '').toLowerCase();
+  const location = (job.location || '').toLowerCase();
+  const company = (job.company || '').toLowerCase();
+
+  if (isFranceLocation(location)) score += 5;
+  if (/paris|lyon|nantes|bordeaux|lille|toulouse|rennes|strasbourg|montpellier|marseille|france|île-de-france|ile-de-france/.test(location)) score += 2;
+  if (/france/.test(company)) score += 1;
+  if (/remote france|full remote france|france entière/.test(location)) score += 3;
+  if (/anglais|english/.test(title)) score -= 1;
+  if (/worldwide|usa|emea|apac|europe/.test(location)) score -= 4;
+  return score;
+}
+
+function techScore(job) {
+  let score = 0;
+  const content = ((job.title || '') + ' ' + (job.stack || []).join(' ')).toLowerCase();
+  for (const kw of TECH_KEYWORDS) {
+    if (content.includes(kw)) score += 1;
+  }
+  return score;
+}
+
+export async function runScraper() {
+  console.log('🌍 Démarrage du scraper Éric V4 max-platforms...');
 
   let totalFound = 0;
   let totalSaved = 0;
   let parserCount = 0;
   let successCount = 0;
   let skippedInvalid = 0;
+  let techRejected = 0;
   let duplicateCount = 0;
-  let nonFranceCount = 0;
   const perParserStats = [];
   const collectedJobs = [];
 
-  let fetchEntries = Object.entries(parsers);
-  if (preferredOnly) {
-    fetchEntries = fetchEntries.filter(([name]) => FRANCE_PREFERRED_PARSERS.includes(name));
-  }
+  const fetchEntries = Object.entries(parsers);
 
   for (const [parserName, fetchFn] of fetchEntries) {
     parserCount++;
     const parserLabel = parserName.replace(/^fetch/, '');
-    const parserStat = { parser: parserLabel, found: 0, saved: 0, invalid: 0, nonFrance: 0, duplicates: 0, techFilteredOut: 0, status: 'ok' };
+    const parserStat = { parser: parserLabel, found: 0, saved: 0, invalid: 0, techFilteredOut: 0, duplicates: 0, status: 'ok' };
 
     try {
-      await sleep(500 + Math.random() * 1000);
+      await sleep(400 + Math.random() * 900);
       const jobs = parserName === 'fetchFranceTravailJobs'
         ? await fetchFn({ keywords: 'développeur', location: 'France', pages: 3 })
         : await fetchFn();
@@ -97,12 +103,8 @@ export async function runScraper({ preferredOnly = true } = {}) {
           parserStat.invalid++;
           return false;
         }
-        if (!isFranceLocation(job.location)) {
-          nonFranceCount++;
-          parserStat.nonFrance++;
-          return false;
-        }
         if (!isTechJob(job.title, job.stack)) {
+          techRejected++;
           parserStat.techFilteredOut++;
           return false;
         }
@@ -122,7 +124,7 @@ export async function runScraper({ preferredOnly = true } = {}) {
 
       successCount++;
       perParserStats.push(parserStat);
-      console.log(`✅ ${parserLabel}: ${parserStat.saved}/${parserStat.found} sauvegardées (${parserStat.invalid} invalides, ${parserStat.nonFrance} hors-France, ${parserStat.techFilteredOut} hors-tech, ${parserStat.duplicates} doublons)`);
+      console.log(`✅ ${parserLabel}: ${parserStat.saved}/${parserStat.found} sauvegardées (${parserStat.invalid} invalides, ${parserStat.techFilteredOut} hors-tech, ${parserStat.duplicates} doublons)`);
     } catch (e) {
       parserStat.status = 'error';
       parserStat.error = e.message;
@@ -132,38 +134,53 @@ export async function runScraper({ preferredOnly = true } = {}) {
   }
 
   const dbCount = await getJobCount();
-  const finalJobs = dedupeJobs(collectedJobs).slice(0, 100);
+  const dedupedAll = dedupeJobs(collectedJobs);
+  const franceCandidates = dedupedAll
+    .map(job => ({ ...job, franceScore: franceScore(job), techScore: techScore(job) }))
+    .filter(job => job.franceScore > 0)
+    .sort((a, b) => (b.franceScore + b.techScore) - (a.franceScore + a.techScore));
 
-  console.log(`\n📊 Résumé France-only V3 :`);
+  const sourceHealth = perParserStats.map(s => ({
+    parser: s.parser,
+    status: s.status,
+    found: s.found,
+    saved: s.saved,
+    efficiency: s.found ? Number((s.saved / s.found).toFixed(2)) : 0
+  })).sort((a,b) => b.saved - a.saved);
+
+  console.log(`\n📊 Résumé V4 :`);
   console.log(`   Parsers exécutés : ${parserCount}`);
   console.log(`   Parsers utiles : ${successCount}`);
   console.log(`   Offres brutes : ${totalFound}`);
   console.log(`   Offres invalides ignorées : ${skippedInvalid}`);
-  console.log(`   Offres hors-France ignorées : ${nonFranceCount}`);
+  console.log(`   Offres hors-tech ignorées : ${techRejected}`);
   console.log(`   Doublons filtrés : ${duplicateCount}`);
-  console.log(`   Offres Tech France sauvegardées : ${totalSaved}`);
+  console.log(`   Offres sauvegardées : ${totalSaved}`);
+  console.log(`   Candidats France : ${franceCandidates.length}`);
   console.log(`   Total en base : ${dbCount}`);
 
   console.log('💾 Génération des exports JSON...');
   try {
     const db = await getDb();
-    const allJobs = db.prepare("SELECT * FROM jobs WHERE source = 'France Travail' ORDER BY created_at DESC LIMIT 100").all();
+    const allJobs = db.prepare('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 150').all();
     await fs.writeFile('latest_jobs.json', JSON.stringify(allJobs, null, 2));
+    await fs.writeFile('all_sources_jobs.json', JSON.stringify(dedupedAll.slice(0, 200), null, 2));
+    await fs.writeFile('france_candidates.json', JSON.stringify(franceCandidates.slice(0, 100), null, 2));
+    await fs.writeFile('source_health.json', JSON.stringify(sourceHealth, null, 2));
     await fs.writeFile('scraper_report.json', JSON.stringify({
       generatedAt: new Date().toISOString(),
-      preferredOnly,
-      mode: 'france-only-v3',
-      summary: { parserCount, successCount, totalFound, skippedInvalid, nonFranceCount, duplicateCount, totalSaved, dbCount },
+      mode: 'max-platforms-v4',
+      summary: { parserCount, successCount, totalFound, skippedInvalid, techRejected, duplicateCount, totalSaved, franceCandidates: franceCandidates.length, dbCount },
+      sourceHealth,
       parsers: perParserStats,
-      sample: finalJobs.slice(0, 20)
+      franceTop: franceCandidates.slice(0, 20)
     }, null, 2));
-    console.log('✅ latest_jobs.json et scraper_report.json générés.');
+    console.log('✅ Exports V4 générés.');
   } catch (e) {
     console.error('Erreur export JSON:', e.message);
   }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const preferredOnly = !process.argv.includes('--all');
-  runScraper({ preferredOnly });
+  runScraper();
 }
