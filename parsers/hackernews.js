@@ -1,86 +1,87 @@
-import * as cheerio from 'cheerio';
+import { safeFetch } from './utils.js';
 
 /**
  * Parser pour Hacker News "Who is hiring"
- * Thread mensuel de recrutement
+ * Utilise hnrss avec fallback Algolia pour limiter les pannes 5xx.
  */
 
-export async function fetchJobs() {
+function extractRssItems(xml) {
   const jobs = [];
-  const url = 'https://news.ycombinator.com/latest';
+  const items = xml.split('<item>').slice(1).slice(0, 10);
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+  for (const item of items) {
+    const title = item.match(/<title>(.*?)<\/title>/s)?.[1] || '';
+    const link = item.match(/<link>(.*?)<\/link>/s)?.[1] || '';
+    const date = item.match(/<pubDate>(.*?)<\/pubDate>/s)?.[1] || '';
 
-    const res = await fetch(url, { 
-      signal: controller.signal,
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Cache-Control': 'max-age=300'
-      }
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      if (res.status === 429) {
-        console.log('[HackerNews] Rate limited, using cached data from last run');
-        return jobs; // Retourne vide en attendant le prochain cycle
-      }
-      console.log('[HackerNews] Skipped - HTTP ' + res.status);
-      return jobs;
-    }
-
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    // Chercher les threads "Who is hiring" récents
-    $('.titleline a').each((_, el) => {
-      const title = $(el).text();
-      const link = $(el).attr('href');
-
-      if (title && title.toLowerCase().includes('who is hiring')) {
-        jobs.push({
-          platform: 'hackernews',
-          title: title.substring(0, 150),
-          company: 'Hacker News Community',
-          location: 'Various',
-          url: link || 'https://news.ycombinator.com',
-          source: 'Hacker News',
-          publishedAt: new Date().toISOString(),
-          stack: [],
-          type: 'Full-time'
-        });
-      }
-    });
-
-    // Si on n'a pas trouvé de thread "hiring", on prend les derniers posts tech
-    if (jobs.length === 0) {
-      $('.athing').slice(0, 20).each((_, el) => {
-        const title = $(el).find('.titleline a').first().text();
-        const link = $(el).find('.titleline a').attr('href');
-        
-        if (title && title.length > 5) {
-          jobs.push({
-            platform: 'hackernews',
-            title: title.substring(0, 150),
-            company: 'HN',
-            location: 'Remote',
-            url: link || 'https://news.ycombinator.com',
-            source: 'Hacker News',
-            publishedAt: new Date().toISOString(),
-            stack: [],
-            type: 'Full-time'
-          });
-        }
+    if (/who is hiring|hiring/i.test(title)) {
+      jobs.push({
+        platform: 'hackernews',
+        title: title.trim().substring(0, 200),
+        company: 'Hacker News Community',
+        location: 'Various',
+        url: link.replace(/&amp;/g, '&').trim(),
+        source: 'Hacker News',
+        publishedAt: date,
+        stack: [],
+        type: 'Full-time'
       });
     }
-
-    console.log(`[HackerNews] Found ${jobs.length} jobs`);
-  } catch (e) {
-    console.error('[HackerNews] Error:', e.message);
   }
 
   return jobs;
+}
+
+export async function fetchJobs() {
+  const rssUrl = 'https://hnrss.org/newest?points=3&q=Who%20is%20Hiring';
+  const fallbackUrl = 'https://hn.algolia.com/api/v1/search?query=%22Who%20is%20hiring%22&tags=story';
+
+  try {
+    const res = await safeFetch(rssUrl, {
+      headers: {
+        'Accept': 'application/rss+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    }, 15000);
+
+    if (res.ok) {
+      const xml = await res.text();
+      const jobs = extractRssItems(xml);
+      console.log(`[HackerNews] Found ${jobs.length} jobs via RSS`);
+      return jobs;
+    }
+
+    console.log(`[HackerNews] RSS fallback triggered (HTTP ${res.status})`);
+  } catch (e) {
+    console.log(`[HackerNews] RSS fallback triggered (${e.message})`);
+  }
+
+  try {
+    const res = await safeFetch(fallbackUrl, {
+      headers: { 'Accept': 'application/json' }
+    }, 15000);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const hits = Array.isArray(data.hits) ? data.hits.slice(0, 10) : [];
+
+    const jobs = hits
+      .filter(hit => /who is hiring|hiring/i.test(hit.title || ''))
+      .map(hit => ({
+        platform: 'hackernews',
+        title: (hit.title || '').trim().substring(0, 200),
+        company: 'Hacker News Community',
+        location: 'Various',
+        url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+        source: 'Hacker News',
+        publishedAt: hit.created_at || new Date().toISOString(),
+        stack: [],
+        type: 'Full-time'
+      }));
+
+    console.log(`[HackerNews] Found ${jobs.length} jobs via Algolia fallback`);
+    return jobs;
+  } catch (e) {
+    console.error('[HackerNews] Error:', e.message);
+    return [];
+  }
 }
