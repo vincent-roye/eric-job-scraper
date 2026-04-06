@@ -9,6 +9,16 @@ const USER_AGENTS = [
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
 ];
 
+const FRANCE_LOCATION_PATTERNS = [
+  'france', 'paris', 'lyon', 'marseille', 'toulouse', 'bordeaux', 'lille', 'nantes', 'rennes',
+  'strasbourg', 'montpellier', 'nice', 'francais', 'français', 'ile-de-france', 'île-de-france',
+  'remote france', 'full remote france', 'france entière', 'hybride france'
+];
+
+const NON_FRANCE_LOCATION_PATTERNS = [
+  'worldwide', 'usa', 'united states', 'canada', 'emea', 'apac', 'germany', 'spain', 'uk', 'europe'
+];
+
 export function getRandomUserAgent() {
   return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 }
@@ -55,6 +65,13 @@ export function normalizeJob(job = {}) {
 
 export function isValidJob(job = {}) {
   return Boolean(job.title && job.url && /^https?:\/\//i.test(job.url));
+}
+
+export function isFranceLocation(location = '') {
+  const text = String(location || '').toLowerCase();
+  if (!text) return false;
+  if (NON_FRANCE_LOCATION_PATTERNS.some(x => text.includes(x))) return false;
+  return FRANCE_LOCATION_PATTERNS.some(x => text.includes(x));
 }
 
 export async function sleep(ms) {
