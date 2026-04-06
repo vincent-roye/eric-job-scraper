@@ -1,5 +1,5 @@
 /**
- * Moteur principal du scraper Éric - V2 France-only
+ * Moteur principal du scraper Éric - V3 France-only solide
  */
 
 import { saveJob, getJobCount, getDb } from './db.js';
@@ -11,7 +11,8 @@ const TECH_KEYWORDS = [
   'dev', 'developer', 'développeur', 'engineer', 'ingénieur', 'fullstack', 'frontend', 'backend',
   'python', 'java', 'react', 'node', 'javascript', 'typescript', 'c#', 'ruby', 'go', 'rust',
   'cloud', 'aws', 'azure', 'docker', 'kubernetes', 'data', 'ai', 'machine learning', 'software',
-  'web', 'mobile', 'ios', 'android', 'product engineer', 'sre', 'devops', 'qa', 'test automation'
+  'web', 'mobile', 'ios', 'android', 'product engineer', 'sre', 'devops', 'qa', 'test automation',
+  '.net', 'php', 'angular', 'spring', 'full stack', 'frontend', 'backend', 'logiciel embarqué'
 ];
 
 const FRANCE_PREFERRED_PARSERS = [
@@ -29,7 +30,7 @@ const FRANCE_PREFERRED_PARSERS = [
 
 const NON_TECH_TITLE_PATTERNS = [
   'copywriter', 'customer success', 'office assistant', 'content reviewer', 'inside sales',
-  'customer support', 'project coordinator', 'retention manager'
+  'customer support', 'project coordinator', 'retention manager', 'commercial', 'vendeur', 'comptable'
 ];
 
 function isTechJob(title, stack) {
@@ -53,7 +54,7 @@ function dedupeJobs(jobs) {
 }
 
 export async function runScraper({ preferredOnly = true } = {}) {
-  console.log('🇫🇷 Démarrage du scraper Éric France-only...');
+  console.log('🇫🇷 Démarrage du scraper Éric France-only V3...');
 
   let totalFound = 0;
   let totalSaved = 0;
@@ -77,7 +78,9 @@ export async function runScraper({ preferredOnly = true } = {}) {
 
     try {
       await sleep(500 + Math.random() * 1000);
-      const jobs = await fetchFn();
+      const jobs = parserName === 'fetchFranceTravailJobs'
+        ? await fetchFn({ keywords: 'développeur', location: 'France', pages: 3 })
+        : await fetchFn();
 
       if (!Array.isArray(jobs) || jobs.length === 0) {
         parserStat.status = 'empty';
@@ -131,7 +134,7 @@ export async function runScraper({ preferredOnly = true } = {}) {
   const dbCount = await getJobCount();
   const finalJobs = dedupeJobs(collectedJobs).slice(0, 100);
 
-  console.log(`\n📊 Résumé France-only :`);
+  console.log(`\n📊 Résumé France-only V3 :`);
   console.log(`   Parsers exécutés : ${parserCount}`);
   console.log(`   Parsers utiles : ${successCount}`);
   console.log(`   Offres brutes : ${totalFound}`);
@@ -144,12 +147,12 @@ export async function runScraper({ preferredOnly = true } = {}) {
   console.log('💾 Génération des exports JSON...');
   try {
     const db = await getDb();
-    const allJobs = db.prepare("SELECT * FROM jobs WHERE lower(location) LIKE '%france%' OR lower(location) LIKE '%paris%' OR lower(location) LIKE '%lyon%' ORDER BY created_at DESC LIMIT 100").all();
+    const allJobs = db.prepare("SELECT * FROM jobs WHERE source = 'France Travail' ORDER BY created_at DESC LIMIT 100").all();
     await fs.writeFile('latest_jobs.json', JSON.stringify(allJobs, null, 2));
     await fs.writeFile('scraper_report.json', JSON.stringify({
       generatedAt: new Date().toISOString(),
       preferredOnly,
-      mode: 'france-only',
+      mode: 'france-only-v3',
       summary: { parserCount, successCount, totalFound, skippedInvalid, nonFranceCount, duplicateCount, totalSaved, dbCount },
       parsers: perParserStats,
       sample: finalJobs.slice(0, 20)
