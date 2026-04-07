@@ -1,54 +1,5 @@
 [
   {
-    "parser": "FranceTravailJobs",
-    "status": "ok",
-    "found": 60,
-    "saved": 51,
-    "efficiency": 0.85
-  },
-  {
-    "parser": "DevToJobs",
-    "status": "ok",
-    "found": 25,
-    "saved": 24,
-    "efficiency": 0.96
-  },
-  {
-    "parser": "RemoteOKJobs",
-    "status": "ok",
-    "found": 30,
-    "saved": 24,
-    "efficiency": 0.8
-  },
-  {
-    "parser": "GitHubJobs",
-    "status": "ok",
-    "found": 20,
-    "saved": 13,
-    "efficiency": 0.65
-  },
-  {
-    "parser": "HackerNewsJobs",
-    "status": "ok",
-    "found": 10,
-    "saved": 10,
-    "efficiency": 1
-  },
-  {
-    "parser": "RemotiveJobs",
-    "status": "ok",
-    "found": 20,
-    "saved": 10,
-    "efficiency": 0.5
-  },
-  {
-    "parser": "RedditJobs",
-    "status": "ok",
-    "found": 20,
-    "saved": 8,
-    "efficiency": 0.4
-  },
-  {
     "parser": "ApecJobs",
     "status": "empty",
     "found": 0,
@@ -84,6 +35,13 @@
     "efficiency": 0
   },
   {
+    "parser": "DevToJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
     "parser": "DjangoJobs",
     "status": "empty",
     "found": 0,
@@ -92,6 +50,13 @@
   },
   {
     "parser": "EmploiticJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "FranceTravailJobs",
     "status": "empty",
     "found": 0,
     "saved": 0,
@@ -112,6 +77,13 @@
     "efficiency": 0
   },
   {
+    "parser": "GitHubJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
     "parser": "GlassdoorJobs",
     "status": "empty",
     "found": 0,
@@ -120,6 +92,13 @@
   },
   {
     "parser": "GoJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "HackerNewsJobs",
     "status": "empty",
     "found": 0,
     "saved": 0,
@@ -252,6 +231,13 @@
     "efficiency": 0
   },
   {
+    "parser": "RedditJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
     "parser": "RegionJobJobs",
     "status": "empty",
     "found": 0,
@@ -273,7 +259,21 @@
     "efficiency": 0
   },
   {
+    "parser": "RemoteOKJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
     "parser": "RemoteWorkJobs",
+    "status": "empty",
+    "found": 0,
+    "saved": 0,
+    "efficiency": 0
+  },
+  {
+    "parser": "RemotiveJobs",
     "status": "empty",
     "found": 0,
     "saved": 0,

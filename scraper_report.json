@@ -1,67 +1,18 @@
 {
-  "generatedAt": "2026-04-06T12:28:04.152Z",
+  "generatedAt": "2026-04-07T00:07:26.177Z",
   "mode": "max-platforms-v4",
   "summary": {
     "parserCount": 48,
-    "successCount": 7,
-    "totalFound": 185,
+    "successCount": 0,
+    "totalFound": 0,
     "skippedInvalid": 0,
-    "techRejected": 45,
+    "techRejected": 0,
     "duplicateCount": 0,
-    "totalSaved": 140,
-    "franceCandidates": 17,
+    "totalSaved": 0,
+    "franceCandidates": 0,
     "dbCount": 151
   },
   "sourceHealth": [
-    {
-      "parser": "FranceTravailJobs",
-      "status": "ok",
-      "found": 60,
-      "saved": 51,
-      "efficiency": 0.85
-    },
-    {
-      "parser": "DevToJobs",
-      "status": "ok",
-      "found": 25,
-      "saved": 24,
-      "efficiency": 0.96
-    },
-    {
-      "parser": "RemoteOKJobs",
-      "status": "ok",
-      "found": 30,
-      "saved": 24,
-      "efficiency": 0.8
-    },
-    {
-      "parser": "GitHubJobs",
-      "status": "ok",
-      "found": 20,
-      "saved": 13,
-      "efficiency": 0.65
-    },
-    {
-      "parser": "HackerNewsJobs",
-      "status": "ok",
-      "found": 10,
-      "saved": 10,
-      "efficiency": 1
-    },
-    {
-      "parser": "RemotiveJobs",
-      "status": "ok",
-      "found": 20,
-      "saved": 10,
-      "efficiency": 0.5
-    },
-    {
-      "parser": "RedditJobs",
-      "status": "ok",
-      "found": 20,
-      "saved": 8,
-      "efficiency": 0.4
-    },
     {
       "parser": "ApecJobs",
       "status": "empty",
@@ -98,6 +49,13 @@
       "efficiency": 0
     },
     {
+      "parser": "DevToJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
       "parser": "DjangoJobs",
       "status": "empty",
       "found": 0,
@@ -106,6 +64,13 @@
     },
     {
       "parser": "EmploiticJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "FranceTravailJobs",
       "status": "empty",
       "found": 0,
       "saved": 0,
@@ -126,6 +91,13 @@
       "efficiency": 0
     },
     {
+      "parser": "GitHubJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
       "parser": "GlassdoorJobs",
       "status": "empty",
       "found": 0,
@@ -134,6 +106,13 @@
     },
     {
       "parser": "GoJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "HackerNewsJobs",
       "status": "empty",
       "found": 0,
       "saved": 0,
@@ -266,6 +245,13 @@
       "efficiency": 0
     },
     {
+      "parser": "RedditJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
       "parser": "RegionJobJobs",
       "status": "empty",
       "found": 0,
@@ -287,7 +273,21 @@
       "efficiency": 0
     },
     {
+      "parser": "RemoteOKJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
       "parser": "RemoteWorkJobs",
+      "status": "empty",
+      "found": 0,
+      "saved": 0,
+      "efficiency": 0
+    },
+    {
+      "parser": "RemotiveJobs",
       "status": "empty",
       "found": 0,
       "saved": 0,
@@ -398,12 +398,12 @@
     },
     {
       "parser": "DevToJobs",
-      "found": 25,
-      "saved": 24,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 1,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "DjangoJobs",
@@ -425,12 +425,12 @@
     },
     {
       "parser": "FranceTravailJobs",
-      "found": 60,
-      "saved": 51,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 9,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "FreeWorkJobs",
@@ -452,12 +452,12 @@
     },
     {
       "parser": "GitHubJobs",
-      "found": 20,
-      "saved": 13,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 7,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "GlassdoorJobs",
@@ -479,12 +479,12 @@
     },
     {
       "parser": "HackerNewsJobs",
-      "found": 10,
-      "saved": 10,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
       "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "HelloworkJobs",
@@ -650,12 +650,12 @@
     },
     {
       "parser": "RedditJobs",
-      "found": 20,
-      "saved": 8,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 12,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "RegionJobJobs",
@@ -686,12 +686,12 @@
     },
     {
       "parser": "RemoteOKJobs",
-      "found": 30,
-      "saved": 24,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 6,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "RemoteWorkJobs",
@@ -704,12 +704,12 @@
     },
     {
       "parser": "RemotiveJobs",
-      "found": 20,
-      "saved": 10,
+      "found": 0,
+      "saved": 0,
       "invalid": 0,
-      "techFilteredOut": 10,
+      "techFilteredOut": 0,
       "duplicates": 0,
-      "status": "ok"
+      "status": "empty"
     },
     {
       "parser": "RubyOnRailsJobs",
@@ -784,210 +784,5 @@
       "status": "empty"
     }
   ],
-  "franceTop": [
-    {
-      "title": "Lead développeur NodeJS / Angular (H/F)",
-      "company": "SIMPLICITI",
-      "location": "69 - Lyon 6e Arrondissement",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LXJD",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.646Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 3
-    },
-    {
-      "title": "Développeur Java Spring Boot (H/F)",
-      "company": "WIZBII",
-      "location": "69 - Lyon 1er Arrondissement",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQMD",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.647Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 3
-    },
-    {
-      "title": "DÉVELOPPEUR BACKEND C++ (H/F)",
-      "company": "SEGMENT ELITE",
-      "location": "75 - PARIS",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JNTG",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.051Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 3
-    },
-    {
-      "title": "Développeur-se Back-end Python H/F (H/F)",
-      "company": "OCTOPUS ENERGY FRANCE",
-      "location": "75 - PARIS 02",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GZXK",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.052Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 8,
-      "techScore": 2
-    },
-    {
-      "title": "Developpeur React Native (H/F)",
-      "company": "Kent",
-      "location": "75 - Paris 11e Arrondissement",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206MCWX",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.645Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur Back-End .NET (H/F)",
-      "company": "SEGMENT ELITE",
-      "location": "75 - PARIS",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206MBRY",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.646Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur React (H/F)",
-      "company": "WIZBII",
-      "location": "69 - Lyon 1er Arrondissement",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQRT",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.647Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur Python Expert en Supervision Réseau (H/F)",
-      "company": "SEGMENT ELITE",
-      "location": "75 - PARIS",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JPDC",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.051Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur React Native Junior (H/F)",
-      "company": "INFORMATIS TECHNOLOGY SYSTM",
-      "location": "44 - Nantes",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FFMF",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.423Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur React Native Senior (H/F)",
-      "company": "INFORMATIS TECHNOLOGY SYSTM",
-      "location": "44 - Nantes",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FFFH",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.423Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 2
-    },
-    {
-      "title": "Développeur (H/F)",
-      "company": "WIZBII",
-      "location": "69 - Lyon 1er Arrondissement",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206LQXQ",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.647Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 1
-    },
-    {
-      "title": "Développeur Applicatif (H/F)",
-      "company": "CREATIVE INFORMATION TECHNOLOGY",
-      "location": "69 - LYON 09",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206KRCG",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:53.648Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 1
-    },
-    {
-      "title": "Développeur ServiceNow - IA / ITSM (H/F)",
-      "company": "INFORMATIS TECHNOLOGY SYSTM",
-      "location": "75 - PARIS",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GLCR",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.422Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 1
-    },
-    {
-      "title": "Développeur ServiceNow HRSD (H/F)",
-      "company": "INFORMATIS TECHNOLOGY SYSTM",
-      "location": "75 - Paris",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206GKBD",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.422Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 1
-    },
-    {
-      "title": "concepteur développeur en alternance (H/F)",
-      "company": "CAISSE PRIMAIRE ASSURANCE MALADIE",
-      "location": "33 - BORDEAUX",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206FBRZ",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.423Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 7,
-      "techScore": 1
-    },
-    {
-      "title": "Développeur Sénior - Full English & Full Remote (H/F)",
-      "company": "INFORMATIS TECHNOLOGY SYSTM",
-      "location": "Île-de-France",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206JYVY",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.051Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 6,
-      "techScore": 1
-    },
-    {
-      "title": "Développeur fullstack (H/F)",
-      "company": "FRANCE DETECTION SERVICES",
-      "location": "84 - LE THOR",
-      "url": "https://candidat.francetravail.fr/offres/recherche/detail/206HLRV",
-      "source": "France Travail",
-      "publishedAt": "2026-04-06T12:26:54.052Z",
-      "stack": [],
-      "type": "CDI",
-      "franceScore": 1,
-      "techScore": 2
-    }
-  ]
+  "franceTop": []
 }
