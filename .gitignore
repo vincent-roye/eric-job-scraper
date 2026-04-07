@@ -1,1 +1,29 @@
+# Dépendances
 node_modules/
+
+# Base de données
+jobs.sqlite
+
+# Exports JSON générés
+latest_jobs.json
+all_sources_jobs.json
+france_candidates.json
+france_shortlist.json
+open_positions_fr.json
+source_health.json
+scraper_report.json
+
+# Logs
+scraper_run.log
+/tmp/eric_scraper_log.txt
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
