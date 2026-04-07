@@ -57,7 +57,7 @@ async function handleApi(req, res) {
     let jobs;
     if (search) {
       const q = `%${search}%`;
-      jobs = await queryAll("SELECT * FROM jobs WHERE title LIKE ? OR company LIKE ? OR location LIKE ? ORDER BY created_at DESC LIMIT 50", [q, q, q]);
+      jobs = await queryAll("SELECT * FROM jobs WHERE title ILIKE ? OR company ILIKE ? OR location ILIKE ? ORDER BY created_at DESC LIMIT 50", [q, q, q]);
     } else if (source) {
       jobs = await queryAll('SELECT * FROM jobs WHERE source = ? ORDER BY created_at DESC LIMIT ?', [source, limit]);
     } else {
@@ -69,7 +69,7 @@ async function handleApi(req, res) {
 
   if (path === '/api/france') {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
-    const jobs = (await queryAll("SELECT * FROM jobs WHERE location LIKE '%paris%' OR location LIKE '%lyon%' OR location LIKE '%france%' OR location LIKE '%marseille%' OR location LIKE '%toulouse%' OR location LIKE '%bordeaux%' OR location LIKE '%lille%' OR location LIKE '%nantes%' OR location LIKE '%rennes%' ORDER BY created_at DESC LIMIT ?", [limit]))
+    const jobs = (await queryAll("SELECT * FROM jobs WHERE location ILIKE '%paris%' OR location ILIKE '%lyon%' OR location ILIKE '%france%' OR location ILIKE '%marseille%' OR location ILIKE '%toulouse%' OR location ILIKE '%bordeaux%' OR location ILIKE '%lille%' OR location ILIKE '%nantes%' OR location ILIKE '%rennes%' ORDER BY created_at DESC LIMIT ?", [limit]))
       .map(j => ({ ...j, stack: tryParse(j.stack) }));
     return apiResponse(res, { count: jobs.length, jobs });
   }

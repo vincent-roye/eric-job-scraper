@@ -1,29 +1,28 @@
-import initSqlJs from 'sql.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+/**
+ * Module base de données — PostgreSQL (Neon)
+ */
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, 'jobs.sqlite');
+import pg from 'pg';
 
-let _db = null;
+const DATABASE_URL = process.env.DATABASE_URL
+  || 'postgresql://neondb_owner:npg_TkJy7aXfbx2U@ep-old-queen-ab6doj1b.eu-west-2.aws.neon.tech/neondb?sslmode=require';
+
+const pool = new pg.Pool({
+  connectionString: DATABASE_URL,
+  max: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  ssl: { rejectUnauthorized: false },
+});
+
+let initialized = false;
 
 async function initDb() {
-  if (_db) return _db;
+  if (initialized) return;
 
-  const SQL = await initSqlJs();
-
-  // Charger la base existante si elle existe
-  if (fs.existsSync(DB_PATH)) {
-    const buffer = fs.readFileSync(DB_PATH);
-    _db = new SQL.Database(buffer);
-  } else {
-    _db = new SQL.Database();
-  }
-
-  _db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS jobs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       title TEXT,
       company TEXT,
       location TEXT,
@@ -32,38 +31,23 @@ async function initDb() {
       published_at TEXT,
       stack TEXT,
       type TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  _db.run('CREATE INDEX IF NOT EXISTS idx_url ON jobs(url)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_url ON jobs(url)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_source ON jobs(source)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at DESC)');
 
-  persist();
-  return _db;
-}
-
-function persist() {
-  if (!_db) return;
-  const data = _db.export();
-  fs.writeFileSync(DB_PATH, Buffer.from(data));
-}
-
-// Sauvegarder sur disque toutes les 30 secondes et à la sortie du process
-let persistTimer = null;
-function startAutoPersist() {
-  if (persistTimer) return;
-  persistTimer = setInterval(() => persist(), 30000);
-  process.on('exit', () => persist());
-  process.on('SIGINT', () => { persist(); process.exit(); });
-  process.on('SIGTERM', () => { persist(); process.exit(); });
+  initialized = true;
 }
 
 export async function saveJob(job) {
-  const db = await initDb();
-  startAutoPersist();
+  await initDb();
   try {
-    db.run(
-      `INSERT OR IGNORE INTO jobs (title, company, location, url, source, published_at, stack, type)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    await pool.query(
+      `INSERT INTO jobs (title, company, location, url, source, published_at, stack, type)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (url) DO NOTHING`,
       [job.title, job.company, job.location, job.url, job.source, job.publishedAt, JSON.stringify(job.stack), job.type]
     );
   } catch (e) {
@@ -72,28 +56,18 @@ export async function saveJob(job) {
 }
 
 export async function getJobCount() {
-  const db = await initDb();
-  const result = db.exec('SELECT COUNT(*) as count FROM jobs');
-  return result[0]?.values[0]?.[0] || 0;
+  await initDb();
+  const result = await pool.query('SELECT COUNT(*) as count FROM jobs');
+  return parseInt(result.rows[0].count, 10);
 }
 
-export async function getDb() {
-  const db = await initDb();
-  startAutoPersist();
-  return db;
-}
-
-// Helper pour exécuter des requêtes et récupérer des objets (comme better-sqlite3 .all())
 export async function queryAll(sql, params = []) {
-  const db = await initDb();
-  const stmt = db.prepare(sql);
-  if (params.length) stmt.bind(params);
-  const rows = [];
-  while (stmt.step()) {
-    rows.push(stmt.getAsObject());
-  }
-  stmt.free();
-  return rows;
+  await initDb();
+  // Convertir les placeholders ? en $1, $2, ... pour pg
+  let i = 0;
+  const pgSql = sql.replace(/\?/g, () => `$${++i}`);
+  const result = await pool.query(pgSql, params);
+  return result.rows;
 }
 
 export async function queryGet(sql, params = []) {
@@ -102,5 +76,9 @@ export async function queryGet(sql, params = []) {
 }
 
 export async function persistNow() {
-  persist();
+  // No-op pour PostgreSQL (auto-commit)
+}
+
+export async function closeDb() {
+  await pool.end();
 }
