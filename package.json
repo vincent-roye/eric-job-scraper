@@ -79,6 +79,7 @@
     "smart-buffer": "^4.2.0",
     "socks": "^2.8.7",
     "socks-proxy-agent": "^8.0.5",
+    "sql.js": "^1.14.1",
     "ssri": "^13.0.1",
     "string_decoder": "^1.3.0",
     "strip-json-comments": "^2.0.1",
@@ -95,6 +96,7 @@
   "scripts": {
     "scrape": "node scraper.js",
     "monitor": "node monitor.js",
+    "sync": "node daily_sync.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

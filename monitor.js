@@ -6,24 +6,14 @@
 
 import http from 'http';
 import fs from 'fs/promises';
-import Database from 'better-sqlite3';
+import { queryAll, queryGet } from './db.js';
 import { runScraper } from './scraper.js';
 
 const PORT = process.env.PORT || 3847;
-const db = new Database('./jobs.sqlite');
-
-// Prépare les requêtes SQL
-const stmts = {
-  totalJobs: db.prepare('SELECT COUNT(*) as count FROM jobs'),
-  bySources: db.prepare('SELECT source, COUNT(*) as count FROM jobs GROUP BY source ORDER BY count DESC'),
-  recentJobs: db.prepare('SELECT * FROM jobs ORDER BY created_at DESC LIMIT ?'),
-  jobsBySource: db.prepare('SELECT * FROM jobs WHERE source = ? ORDER BY created_at DESC LIMIT ?'),
-  searchJobs: db.prepare("SELECT * FROM jobs WHERE title LIKE ? OR company LIKE ? OR location LIKE ? ORDER BY created_at DESC LIMIT 50"),
-  franceJobs: db.prepare("SELECT * FROM jobs WHERE location LIKE '%paris%' OR location LIKE '%lyon%' OR location LIKE '%france%' OR location LIKE '%marseille%' OR location LIKE '%toulouse%' OR location LIKE '%bordeaux%' OR location LIKE '%lille%' OR location LIKE '%nantes%' OR location LIKE '%rennes%' ORDER BY created_at DESC LIMIT ?"),
-};
 
 let scraperRunning = false;
 let lastRunResult = null;
+let lastRunLogs = [];
 
 async function loadReport() {
   try {
@@ -32,9 +22,20 @@ async function loadReport() {
   } catch { return null; }
 }
 
+async function loadLogs() {
+  try {
+    const data = await fs.readFile('scraper_run.log', 'utf-8');
+    return data.split('\n').filter(Boolean);
+  } catch { return []; }
+}
+
 function apiResponse(res, data, status = 200) {
   res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
   res.end(JSON.stringify(data));
+}
+
+function tryParse(s) {
+  try { return JSON.parse(s); } catch { return []; }
 }
 
 async function handleApi(req, res) {
@@ -42,10 +43,11 @@ async function handleApi(req, res) {
   const path = url.pathname;
 
   if (path === '/api/stats') {
-    const total = stmts.totalJobs.get().count;
-    const sources = stmts.bySources.all();
+    const totalRow = await queryGet('SELECT COUNT(*) as count FROM jobs');
+    const total = totalRow?.count || 0;
+    const sources = await queryAll('SELECT source, COUNT(*) as count FROM jobs GROUP BY source ORDER BY count DESC');
     const report = await loadReport();
-    return apiResponse(res, { total, sources, lastRun: report?.generatedAt || null, report: report?.summary || null, sourceHealth: report?.sourceHealth || [] });
+    return apiResponse(res, { total, sources, lastRun: report?.generatedAt || null, report: report?.summary || null, sourceHealth: report?.sourceHealth || [], durationSec: report?.durationSec || null });
   }
 
   if (path === '/api/jobs') {
@@ -55,11 +57,11 @@ async function handleApi(req, res) {
     let jobs;
     if (search) {
       const q = `%${search}%`;
-      jobs = stmts.searchJobs.all(q, q, q);
+      jobs = await queryAll("SELECT * FROM jobs WHERE title LIKE ? OR company LIKE ? OR location LIKE ? ORDER BY created_at DESC LIMIT 50", [q, q, q]);
     } else if (source) {
-      jobs = stmts.jobsBySource.all(source, limit);
+      jobs = await queryAll('SELECT * FROM jobs WHERE source = ? ORDER BY created_at DESC LIMIT ?', [source, limit]);
     } else {
-      jobs = stmts.recentJobs.all(limit);
+      jobs = await queryAll('SELECT * FROM jobs ORDER BY created_at DESC LIMIT ?', [limit]);
     }
     jobs = jobs.map(j => ({ ...j, stack: tryParse(j.stack) }));
     return apiResponse(res, { count: jobs.length, jobs });
@@ -67,17 +69,25 @@ async function handleApi(req, res) {
 
   if (path === '/api/france') {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
-    const jobs = stmts.franceJobs.all(limit).map(j => ({ ...j, stack: tryParse(j.stack) }));
+    const jobs = (await queryAll("SELECT * FROM jobs WHERE location LIKE '%paris%' OR location LIKE '%lyon%' OR location LIKE '%france%' OR location LIKE '%marseille%' OR location LIKE '%toulouse%' OR location LIKE '%bordeaux%' OR location LIKE '%lille%' OR location LIKE '%nantes%' OR location LIKE '%rennes%' ORDER BY created_at DESC LIMIT ?", [limit]))
+      .map(j => ({ ...j, stack: tryParse(j.stack) }));
     return apiResponse(res, { count: jobs.length, jobs });
+  }
+
+  if (path === '/api/logs') {
+    const logs = lastRunLogs.length ? lastRunLogs : await loadLogs();
+    return apiResponse(res, { lines: logs });
   }
 
   if (path === '/api/run' && req.method === 'POST') {
     if (scraperRunning) return apiResponse(res, { status: 'already_running' }, 409);
     scraperRunning = true;
     lastRunResult = { status: 'running', startedAt: new Date().toISOString() };
+    lastRunLogs = [];
     apiResponse(res, { status: 'started' });
     try {
-      await runScraper();
+      const result = await runScraper();
+      lastRunLogs = result?.logLines || [];
       lastRunResult = { status: 'completed', completedAt: new Date().toISOString() };
     } catch (e) {
       lastRunResult = { status: 'error', error: e.message };
@@ -94,10 +104,6 @@ async function handleApi(req, res) {
   return apiResponse(res, { error: 'Not found' }, 404);
 }
 
-function tryParse(s) {
-  try { return JSON.parse(s); } catch { return []; }
-}
-
 const DASHBOARD_HTML = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -109,7 +115,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
   .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
   header h1 { font-size: 1.5rem; }
   header h1 span { color: var(--accent); }
   .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: opacity 0.2s; }
@@ -117,22 +123,23 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
   .btn-outline.active { background: var(--accent); border-color: var(--accent); }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
   .stat-card .label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .stat-card .value { font-size: 2rem; font-weight: 700; margin-top: 4px; }
   .stat-card .value.green { color: var(--green); }
   .stat-card .value.orange { color: var(--orange); }
   .stat-card .value.blue { color: var(--accent); }
+  .stat-card .value.red { color: var(--red); }
   .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
   @media (max-width: 900px) { .panels { grid-template-columns: 1fr; } }
   .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
   .panel h2 { font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .source-list { list-style: none; }
-  .source-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; padding-left: 8px; padding-right: 8px; border-radius: 6px; }
+  .source-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 6px; transition: background 0.15s; }
   .source-item:hover { background: rgba(59,130,246,0.1); }
   .source-item:last-child { border-bottom: none; }
-  .source-name { font-weight: 500; }
   .source-count { background: var(--accent); color: white; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
   .health-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
   .health-dot.ok { background: var(--green); }
@@ -155,20 +162,47 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
   .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(59,130,246,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .empty { color: var(--muted); text-align: center; padding: 40px; }
-  .time-ago { color: var(--muted); font-size: 0.8rem; }
+
+  /* Log viewer */
+  .log-panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; display: none; }
+  .log-panel.visible { display: block; }
+  .log-panel h2 { font-size: 1rem; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .log-content { background: #0b1120; border-radius: 8px; padding: 16px; max-height: 500px; overflow-y: auto; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.8rem; line-height: 1.7; white-space: pre-wrap; word-break: break-all; }
+  .log-line { padding: 1px 0; }
+  .log-line.error { color: var(--red); }
+  .log-line.warn { color: var(--orange); }
+  .log-line.ok { color: var(--green); }
+  .log-line.debug { color: var(--muted); }
+  .log-line.stat { color: #a78bfa; }
+  .log-line.info { color: var(--text); }
+  .log-filter { display: flex; gap: 6px; }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1><span>Éric</span> Job Scraper — Monitoring</h1>
+    <h1><span>Eric</span> Job Scraper — Monitoring</h1>
     <div style="display:flex;align-items:center;gap:16px;">
       <div id="scraper-status"></div>
       <button class="btn" id="run-btn" onclick="launchScraper()">Lancer le scraper</button>
+      <button class="btn btn-outline btn-sm" onclick="toggleLogs()">Logs</button>
     </div>
   </header>
 
   <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="log-panel" id="log-panel">
+    <h2>
+      <span>Logs du dernier run</span>
+      <div class="log-filter">
+        <button class="btn btn-outline btn-sm active" data-lf="all" onclick="filterLogs('all')">Tout</button>
+        <button class="btn btn-outline btn-sm" data-lf="error" onclick="filterLogs('error')">Erreurs</button>
+        <button class="btn btn-outline btn-sm" data-lf="warn" onclick="filterLogs('warn')">Warnings</button>
+        <button class="btn btn-outline btn-sm" data-lf="stat" onclick="filterLogs('stat')">Stats</button>
+      </div>
+    </h2>
+    <div class="log-content" id="log-content"></div>
+  </div>
 
   <div class="panels">
     <div class="panel">
@@ -176,7 +210,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
       <ul class="source-list" id="source-list"></ul>
     </div>
     <div class="panel">
-      <h2>Santé des parsers</h2>
+      <h2>Sante des parsers</h2>
       <ul class="source-list" id="health-list"></ul>
     </div>
   </div>
@@ -203,6 +237,8 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 const API = '';
 let currentTab = 'all';
 let pollInterval = null;
+let allLogLines = [];
+let currentLogFilter = 'all';
 
 async function fetchJSON(url) {
   const res = await fetch(API + url);
@@ -211,26 +247,31 @@ async function fetchJSON(url) {
 
 async function loadStats() {
   const data = await fetchJSON('/api/stats');
+  const errCount = (data.sourceHealth || []).filter(s => s.status === 'error').length;
   document.getElementById('stats-grid').innerHTML = [
     statCard('Total offres', data.total, 'blue'),
     statCard('Sources actives', data.sources.length, 'green'),
     statCard('Dernier run', data.lastRun ? timeAgo(data.lastRun) : 'Jamais', 'orange'),
-    statCard('Candidats France', data.report?.franceCandidates ?? '—', 'green'),
+    statCard('Duree run', data.durationSec ? data.durationSec + 's' : '—', 'blue'),
     statCard('Parsers OK', data.report?.successCount ?? '—', 'green'),
+    statCard('Parsers erreur', errCount || '—', errCount > 0 ? 'red' : 'green'),
     statCard('Offres brutes', data.report?.totalFound ?? '—', 'blue'),
+    statCard('Candidats France', data.report?.franceCandidates ?? '—', 'green'),
   ].join('');
 
   document.getElementById('source-list').innerHTML = data.sources.map(s =>
     '<li class="source-item" onclick="filterBySource(\\'' + esc(s.source) + '\\')">' +
-    '<span class="source-name">' + esc(s.source) + '</span>' +
+    '<span>' + esc(s.source) + '</span>' +
     '<span class="source-count">' + s.count + '</span></li>'
   ).join('') || '<li class="empty">Aucune source</li>';
 
-  document.getElementById('health-list').innerHTML = (data.sourceHealth || []).map(s =>
-    '<li class="source-item">' +
+  document.getElementById('health-list').innerHTML = (data.sourceHealth || []).map(s => {
+    const dur = s.durationMs ? (s.durationMs/1000).toFixed(1) + 's' : '-';
+    const errTip = s.error ? ' title="' + esc(s.error) + '"' : '';
+    return '<li class="source-item"' + errTip + '>' +
     '<span><span class="health-dot ' + s.status + '"></span>' + esc(s.parser) + '</span>' +
-    '<span style="font-size:0.85rem;color:var(--muted)">' + s.saved + '/' + s.found + ' (' + Math.round(s.efficiency * 100) + '%)</span></li>'
-  ).join('') || '<li class="empty">Lancez le scraper pour voir la santé</li>';
+    '<span style="font-size:0.85rem;color:var(--muted)">' + s.saved + '/' + s.found + ' | ' + dur + '</span></li>';
+  }).join('') || '<li class="empty">Lancez le scraper pour voir</li>';
 }
 
 async function loadJobs(source, search) {
@@ -244,7 +285,7 @@ async function loadJobs(source, search) {
 
 function renderJobs(jobs) {
   const tbody = document.getElementById('jobs-tbody');
-  if (!jobs.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucune offre trouvée</td></tr>'; return; }
+  if (!jobs.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucune offre trouvee</td></tr>'; return; }
   tbody.innerHTML = jobs.map(j => {
     const stack = (Array.isArray(j.stack) ? j.stack : []).slice(0, 4).map(s => '<span class="tag">' + esc(s) + '</span>').join('');
     return '<tr>' +
@@ -275,10 +316,49 @@ function searchJobs() {
 }
 document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchJobs(); });
 
+// ─── Logs ────────────────────────
+function toggleLogs() {
+  const panel = document.getElementById('log-panel');
+  panel.classList.toggle('visible');
+  if (panel.classList.contains('visible')) refreshLogs();
+}
+
+async function refreshLogs() {
+  const data = await fetchJSON('/api/logs');
+  allLogLines = data.lines || [];
+  renderLogs();
+}
+
+function filterLogs(filter) {
+  currentLogFilter = filter;
+  document.querySelectorAll('[data-lf]').forEach(b => b.classList.toggle('active', b.dataset.lf === filter));
+  renderLogs();
+}
+
+function renderLogs() {
+  const el = document.getElementById('log-content');
+  let lines = allLogLines;
+  if (currentLogFilter !== 'all') {
+    const f = currentLogFilter.toUpperCase();
+    lines = lines.filter(l => l.includes(f));
+  }
+  el.innerHTML = lines.map(l => {
+    let cls = 'info';
+    if (l.includes('ERROR')) cls = 'error';
+    else if (l.includes('WARN')) cls = 'warn';
+    else if (l.includes('OK')) cls = 'ok';
+    else if (l.includes('DEBUG')) cls = 'debug';
+    else if (l.includes('STAT')) cls = 'stat';
+    return '<div class="log-line ' + cls + '">' + esc(l) + '</div>';
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ─── Scraper control ────────────
 async function launchScraper() {
   const btn = document.getElementById('run-btn');
-  btn.disabled = true;
-  btn.textContent = 'En cours...';
+  btn.disabled = true; btn.textContent = 'En cours...';
+  document.getElementById('log-panel').classList.add('visible');
   try {
     await fetch(API + '/api/run', { method: 'POST' });
     startPolling();
@@ -296,21 +376,20 @@ async function updateStatus() {
   const el = document.getElementById('scraper-status');
   const btn = document.getElementById('run-btn');
   if (data.scraperRunning) {
-    el.innerHTML = '<span class="status-badge running"><span class="spinner"></span> Scraping en cours...</span>';
-    btn.disabled = true;
-    btn.textContent = 'En cours...';
+    el.innerHTML = '<span class="status-badge running"><span class="spinner"></span> Scraping...</span>';
+    btn.disabled = true; btn.textContent = 'En cours...';
+    refreshLogs();
   } else {
-    el.innerHTML = '<span class="status-badge idle">En attente</span>';
-    btn.disabled = false;
-    btn.textContent = 'Lancer le scraper';
-    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; loadStats(); loadJobs(); }
+    el.innerHTML = '<span class="status-badge idle">Pret</span>';
+    btn.disabled = false; btn.textContent = 'Lancer le scraper';
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; loadStats(); loadJobs(); refreshLogs(); }
   }
 }
 
 function timeAgo(iso) {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return 'À l\\'instant';
+  if (m < 1) return 'A l\\'instant';
   if (m < 60) return m + ' min';
   const h = Math.floor(m / 60);
   if (h < 24) return h + 'h';
@@ -319,31 +398,26 @@ function timeAgo(iso) {
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 
-// Init
-loadStats();
-loadJobs();
-updateStatus();
+loadStats(); loadJobs(); updateStatus();
 </script>
 </body>
 </html>`;
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
-
-  if (url.pathname.startsWith('/api/')) {
-    return handleApi(req, res);
-  }
-
-  // Serve dashboard
+  if (url.pathname.startsWith('/api/')) return handleApi(req, res);
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(DASHBOARD_HTML);
 });
 
 server.listen(PORT, () => {
-  console.log(`\n🖥️  Monitoring Éric Job Scraper`);
-  console.log(`   Dashboard: http://localhost:${PORT}`);
-  console.log(`   API Stats: http://localhost:${PORT}/api/stats`);
-  console.log(`   API Jobs:  http://localhost:${PORT}/api/jobs`);
-  console.log(`   API France: http://localhost:${PORT}/api/france`);
-  console.log(`\n   Cliquez "Lancer le scraper" dans le dashboard pour démarrer une collecte.\n`);
+  console.log('');
+  console.log('  Eric Job Scraper - Monitoring');
+  console.log('  ─────────────────────────────');
+  console.log('  Dashboard : http://localhost:' + PORT);
+  console.log('  API Stats : http://localhost:' + PORT + '/api/stats');
+  console.log('  API Jobs  : http://localhost:' + PORT + '/api/jobs');
+  console.log('  API France: http://localhost:' + PORT + '/api/france');
+  console.log('  API Logs  : http://localhost:' + PORT + '/api/logs');
+  console.log('');
 });
