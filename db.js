@@ -31,12 +31,20 @@ async function initDb() {
       published_at TEXT,
       stack TEXT,
       type TEXT,
+      country TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
   await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_url ON jobs(url)');
   await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_source ON jobs(source)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_country ON jobs(country)');
   await pool.query('CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at DESC)');
+
+  // Ajouter la colonne country si elle n'existe pas (pour les tables existantes)
+  await pool.query(`
+    ALTER TABLE jobs
+    ADD COLUMN IF NOT EXISTS country TEXT;
+  `);
 
   initialized = true;
 }
@@ -45,10 +53,10 @@ export async function saveJob(job) {
   await initDb();
   try {
     await pool.query(
-      `INSERT INTO jobs (title, company, location, url, source, published_at, stack, type)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO jobs (title, company, location, url, source, published_at, stack, type, country)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        ON CONFLICT (url) DO NOTHING`,
-      [job.title, job.company, job.location, job.url, job.source, job.publishedAt, JSON.stringify(job.stack), job.type]
+      [job.title, job.company, job.location, job.url, job.source, job.publishedAt, JSON.stringify(job.stack), job.type, job.country]
     );
   } catch (e) {
     console.error(`Erreur sauvegarde job ${job.url}:`, e.message);

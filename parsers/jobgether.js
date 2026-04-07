@@ -4,48 +4,42 @@ import { safeFetch } from './utils.js';
  * Parser pour Jobgether — offres France
  */
 
-const JOBGETHER_URLS = [
-  'https://jobgether.com/api/public/v1/jobs?limit=30&offset=0&country=France',
-  'https://jobgether.com/api/public/v1/jobs?limit=30&offset=0&location=Paris',
-  'https://jobgether.com/api/public/v1/jobs?limit=30&offset=0&location=France',
-];
+const JOBGETHER_URL = 'https://jobgether.com/api/public/v1/jobs?limit=50&search=developer&country=fr';
 
 export async function fetchJobs() {
-  const seen = new Set();
-  const allJobs = [];
+  const jobs = [];
 
-  for (const url of JOBGETHER_URLS) {
-    try {
-      const res = await safeFetch(url, {
-        headers: { 'Accept': 'application/json' }
-      }, 15000);
+  try {
+    const res = await safeFetch(JOBGETHER_URL, {
+      headers: { 'Accept': 'application/json' }
+    }, 15000);
 
-      if (!res.ok) continue;
+    if (!res.ok) return jobs;
 
-      const data = await res.json();
-      const jobs = Array.isArray(data.jobs) ? data.jobs : [];
+    const data = await res.json();
+    const jobList = Array.isArray(data.jobs) ? data.jobs : (data.data || []);
 
-      for (const job of jobs) {
-        const jobUrl = job.url || (job.id ? `https://jobgether.com/jobs/${job.id}` : '');
-        if (!job.title || !jobUrl || seen.has(jobUrl)) continue;
-        seen.add(jobUrl);
+    const seen = new Set();
+    for (const job of jobList) {
+      const jobUrl = job.url || (job.id ? `https://jobgether.com/jobs/${job.id}` : '');
+      if (!job.title || !jobUrl || seen.has(jobUrl)) continue;
+      seen.add(jobUrl);
 
-        allJobs.push({
-          title: job.title,
-          company: job.company?.name || 'Entreprise',
-          location: job.location || (job.remote ? 'Remote France' : 'France'),
-          url: jobUrl,
-          source: 'Jobgether',
-          publishedAt: job.published_at || new Date().toISOString(),
-          stack: Array.isArray(job.tags) ? job.tags : (Array.isArray(job.skills) ? job.skills : []),
-          type: job.job_type || 'Full-time'
-        });
-      }
-    } catch (e) {
-      console.error('[Jobgether] Error:', e.message);
+      jobs.push({
+        title: job.title,
+        company: job.company?.name || job.company || 'Jobgether',
+        location: job.location || (job.remote ? 'Remote' : 'France'),
+        url: jobUrl,
+        source: 'Jobgether',
+        publishedAt: job.published_at || job.publishedAt || new Date().toISOString(),
+        stack: Array.isArray(job.tags) ? job.tags : (Array.isArray(job.skills) ? job.skills : []),
+        type: job.job_type || job.type || 'Full-time'
+      });
     }
-  }
 
-  console.log(`[Jobgether] Found ${allJobs.length} jobs`);
-  return allJobs;
+    return jobs.slice(0, 30);
+  } catch (e) {
+    console.error('[Jobgether] Error:', e.message);
+    return [];
+  }
 }

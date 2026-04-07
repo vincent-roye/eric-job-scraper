@@ -260,5 +260,5 @@ export async function runScraper() {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runScraper();
+  await runScraper();
 }

@@ -70,6 +70,7 @@ export function normalizeJob(job = {}) {
     publishedAt: job.publishedAt || new Date().toISOString(),
     stack,
     type: (job.type || 'Unknown').toString().trim(),
+    country: job.country || 'FR',
   };
 }
 

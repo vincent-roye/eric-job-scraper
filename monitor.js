@@ -6,6 +6,7 @@
 
 import http from 'http';
 import fs from 'fs/promises';
+import { exec } from 'child_process';
 import { queryAll, queryGet, checkConnection } from './db.js';
 import { runScraper } from './scraper.js';
 
@@ -190,6 +191,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
     <div style="display:flex;align-items:center;gap:16px;">
       <div id="db-status"></div>
       <div id="scraper-status"></div>
+      <a href="https://console.neon.tech/app/projects/purple-credit-27102292/branches/br-cool-queen-ab9ka6d6/tables" target="_blank" class="btn btn-outline btn-sm">📊 Neon DB</a>
       <button class="btn" id="run-btn" onclick="launchScraper()">Lancer le scraper</button>
       <button class="btn btn-outline btn-sm" onclick="toggleLogs()">Logs</button>
     </div>
@@ -233,7 +235,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 
   <div id="jobs-container">
     <table class="jobs-table">
-      <thead><tr><th>Poste</th><th>Entreprise</th><th>Lieu</th><th>Source</th><th>Stack</th><th>Type</th></tr></thead>
+      <thead><tr><th>Poste</th><th>Entreprise</th><th>Lieu</th><th>Source</th><th>Publié</th><th>Stack</th><th>Type</th></tr></thead>
       <tbody id="jobs-tbody"></tbody>
     </table>
   </div>
@@ -289,9 +291,25 @@ async function loadJobs(source, search) {
   renderJobs(data.jobs);
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '—';
+  const now = new Date();
+  const diffMs = now - date;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+
+  if (diffMins < 60) return diffMins + 'm';
+  if (diffHours < 24) return diffHours + 'h';
+  if (diffDays < 7) return diffDays + 'd';
+  return date.toLocaleDateString('fr-FR');
+}
+
 function renderJobs(jobs) {
   const tbody = document.getElementById('jobs-tbody');
-  if (!jobs.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucune offre trouvee</td></tr>'; return; }
+  if (!jobs.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucune offre trouvee</td></tr>'; return; }
   tbody.innerHTML = jobs.map(j => {
     const stack = (Array.isArray(j.stack) ? j.stack : []).slice(0, 4).map(s => '<span class="tag">' + esc(s) + '</span>').join('');
     return '<tr>' +
@@ -299,6 +317,7 @@ function renderJobs(jobs) {
       '<td>' + esc(j.company) + '</td>' +
       '<td>' + esc(j.location) + '</td>' +
       '<td>' + esc(j.source) + '</td>' +
+      '<td style="font-size:0.85rem;color:var(--muted)">' + formatDate(j.publishedAt) + '</td>' +
       '<td>' + (stack || '<span style="color:var(--muted)">—</span>') + '</td>' +
       '<td>' + esc(j.type) + '</td></tr>';
   }).join('');
@@ -431,6 +450,18 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname.startsWith('/api/')) return handleApi(req, res);
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(DASHBOARD_HTML);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${PORT} déjà en utilisation. Fermeture du processus existant...`);
+    exec(`lsof -ti :${PORT} | xargs kill -9 2>/dev/null || true`, (e) => {
+      if (e) console.log('Note: Impossible de tuer automatiquement. Relancez npm run monitor.');
+      else setTimeout(() => server.listen(PORT), 1000);
+    });
+  } else {
+    throw err;
+  }
 });
 
 server.listen(PORT, () => {

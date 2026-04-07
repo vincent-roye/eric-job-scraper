@@ -1,48 +1,54 @@
 /**
  * Parser pour Cadremploi
  * Plateforme #1 pour les cadres en France
- * Utilise le flux RSS
+ * Note: RSS endpoint bloqué, utilise web scraping
  */
 
-const CADREMPLOI_RSS = 'https://www.cadremploi.fr/jobs/flusss/rss/search.json?query=développeur&location=Paris';
+import * as cheerio from 'cheerio';
+import { safeFetch } from './utils.js';
+
+const CADREMPLOI_URL = 'https://www.cadremploi.fr/offres-emploi/recherche/metier-informatique';
 
 export async function fetchJobs() {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+  const jobs = [];
 
-    const res = await fetch(CADREMPLOI_RSS, { 
-      signal: controller.signal,
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+  try {
+    const res = await safeFetch(CADREMPLOI_URL, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+    }, 15000);
+
+    if (!res.ok) return jobs;
+
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    // Parse Cadremploi job listings
+    $('[data-testid="job-card"], .job-card, li[data-test-id*="job"]').each((_, el) => {
+      const $el = $(el);
+      const title = $el.find('h2, h3, a[href*="/offre"]').first().text().trim();
+      const company = $el.find('.company-name, [data-testid*="company"]').first().text().trim();
+      const location = $el.find('.location, [data-testid*="location"]').first().text().trim();
+      let url = $el.find('a[href*="/offre"]').attr('href') || '';
+
+      if (url && !url.startsWith('http')) {
+        url = 'https://www.cadremploi.fr' + url;
+      }
+
+      if (title && url && url.includes('cadremploi')) {
+        jobs.push({
+          title: title.replace(/\s*F\/H\s*$/i, '').trim(),
+          company: company || 'Cadremploi',
+          location: location || 'France',
+          url,
+          source: 'Cadremploi',
+          publishedAt: new Date().toISOString(),
+          stack: [],
+          type: 'CDI'
+        });
       }
     });
-    clearTimeout(timeoutId);
 
-    if (!res.ok) return [];
-
-    const text = await res.text();
-    const items = text.match(/<item>.*?<\/item>/gs) || [];
-
-    return items.map(item => {
-      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || '';
-      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || '';
-      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
-      
-      // Extraire la localisation si présente
-      const location = item.match(/<g:addressLocality>(.*?)<\/g:addressLocality>/)?.[1] || 'France';
-
-      return {
-        title: title.replace(/\s*F\/H\s*$/i, '').trim(),
-        company: 'Cadremploi',
-        location,
-        url: link,
-        source: 'Cadremploi',
-        publishedAt: pubDate,
-        stack: [],
-        type: 'CDI'
-      };
-    }).filter(j => j.url);
+    return jobs.slice(0, 30);
   } catch (e) {
     console.error('Cadremploi error:', e.message);
     return [];

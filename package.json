@@ -93,9 +93,7 @@
     "yallist": "^5.0.0"
   },
   "scripts": {
-    "scrape": "node scraper.js",
-    "monitor": "node monitor.js",
-    "sync": "node daily_sync.js",
+    "dev": "node monitor.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
