@@ -6,7 +6,7 @@
 
 import http from 'http';
 import fs from 'fs/promises';
-import { queryAll, queryGet } from './db.js';
+import { queryAll, queryGet, checkConnection } from './db.js';
 import { runScraper } from './scraper.js';
 
 const PORT = process.env.PORT || 3847;
@@ -101,6 +101,11 @@ async function handleApi(req, res) {
     return apiResponse(res, { scraperRunning, lastRunResult });
   }
 
+  if (path === '/api/db') {
+    const info = await checkConnection();
+    return apiResponse(res, info);
+  }
+
   return apiResponse(res, { error: 'Not found' }, 404);
 }
 
@@ -183,6 +188,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
   <header>
     <h1><span>Eric</span> Job Scraper — Monitoring</h1>
     <div style="display:flex;align-items:center;gap:16px;">
+      <div id="db-status"></div>
       <div id="scraper-status"></div>
       <button class="btn" id="run-btn" onclick="launchScraper()">Lancer le scraper</button>
       <button class="btn btn-outline btn-sm" onclick="toggleLogs()">Logs</button>
@@ -398,7 +404,24 @@ function timeAgo(iso) {
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 
-loadStats(); loadJobs(); updateStatus();
+async function checkDb() {
+  const el = document.getElementById('db-status');
+  el.innerHTML = '<span class="status-badge running"><span class="spinner"></span> Neon...</span>';
+  try {
+    const data = await fetchJSON('/api/db');
+    if (data.connected) {
+      el.innerHTML = '<span class="status-badge idle" title="' + esc(data.version) + ' | ' + data.latency + 'ms">'
+        + '<span class="health-dot ok" style="margin:0"></span> Neon ' + data.latency + 'ms</span>';
+    } else {
+      el.innerHTML = '<span class="status-badge" style="background:rgba(239,68,68,0.15);color:var(--red)" title="' + esc(data.error) + '">'
+        + '<span class="health-dot error" style="margin:0"></span> Neon KO</span>';
+    }
+  } catch (e) {
+    el.innerHTML = '<span class="status-badge" style="background:rgba(239,68,68,0.15);color:var(--red)"><span class="health-dot error" style="margin:0"></span> Neon KO</span>';
+  }
+}
+
+checkDb(); loadStats(); loadJobs(); updateStatus();
 </script>
 </body>
 </html>`;

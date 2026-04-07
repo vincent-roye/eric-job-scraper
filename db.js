@@ -79,6 +79,18 @@ export async function persistNow() {
   // No-op pour PostgreSQL (auto-commit)
 }
 
+export async function checkConnection() {
+  try {
+    const t0 = Date.now();
+    const res = await pool.query('SELECT version()');
+    const latency = Date.now() - t0;
+    const version = res.rows[0].version.split(' ').slice(0, 2).join(' ');
+    return { connected: true, latency, version, host: DATABASE_URL.match(/@([^/]+)\//)?.[1] || 'unknown' };
+  } catch (e) {
+    return { connected: false, error: e.message };
+  }
+}
+
 export async function closeDb() {
   await pool.end();
 }
