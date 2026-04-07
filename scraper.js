@@ -1,10 +1,10 @@
 /**
- * Moteur principal du scraper Éric - V4 max-platforms
+ * Moteur principal du scraper Éric — offres tech France uniquement
  */
 
 import { saveJob, getJobCount, queryAll, persistNow } from './db.js';
 import * as parsers from './parsers/index.js';
-import { sleep, normalizeJob, isValidJob, isFranceLocation } from './parsers/utils.js';
+import { sleep, normalizeJob, isValidJob } from './parsers/utils.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -13,16 +13,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOG_PATH = path.join(__dirname, 'scraper_run.log');
 
 const TECH_KEYWORDS = [
-  'dev', 'developer', 'développeur', 'engineer', 'ingénieur', 'fullstack', 'frontend', 'backend',
+  'dev', 'developer', 'développeur', 'développeuse', 'engineer', 'ingénieur',
+  'fullstack', 'full-stack', 'full stack', 'frontend', 'front-end', 'backend', 'back-end',
   'python', 'java', 'react', 'node', 'javascript', 'typescript', 'c#', 'ruby', 'go', 'rust',
   'cloud', 'aws', 'azure', 'docker', 'kubernetes', 'data', 'ai', 'machine learning', 'software',
   'web', 'mobile', 'ios', 'android', 'product engineer', 'sre', 'devops', 'qa', 'test automation',
-  '.net', 'php', 'angular', 'spring', 'full stack', 'logiciel embarqué', 'c++'
+  '.net', 'php', 'angular', 'spring', 'logiciel embarqué', 'c++', 'vue.js', 'django', 'laravel',
+  'symfony', 'informatique', 'architecte logiciel', 'lead tech', 'tech lead', 'cto', 'scrum master'
 ];
 
 const NON_TECH_TITLE_PATTERNS = [
   'copywriter', 'customer success', 'office assistant', 'content reviewer', 'inside sales',
-  'customer support', 'project coordinator', 'retention manager', 'commercial', 'vendeur', 'comptable'
+  'customer support', 'project coordinator', 'retention manager', 'commercial', 'vendeur',
+  'comptable', 'assistante', 'secrétaire', 'chauffeur', 'livreur', 'agent immobilier',
+  'business développeur', 'business developer'
 ];
 
 // ─── Logger détaillé ─────────────────────────────────────────────────
@@ -60,21 +64,6 @@ function dedupeJobs(jobs) {
   return out;
 }
 
-function franceScore(job) {
-  let score = 0;
-  const location = (job.location || '').toLowerCase();
-  const company = (job.company || '').toLowerCase();
-  const title = (job.title || '').toLowerCase();
-
-  if (isFranceLocation(location)) score += 5;
-  if (/paris|lyon|nantes|bordeaux|lille|toulouse|rennes|strasbourg|montpellier|marseille|france|île-de-france|ile-de-france/.test(location)) score += 2;
-  if (/france/.test(company)) score += 1;
-  if (/remote france|full remote france|france entière/.test(location)) score += 3;
-  if (/anglais|english/.test(title)) score -= 1;
-  if (/worldwide|usa|emea|apac|europe/.test(location)) score -= 4;
-  return score;
-}
-
 function techScore(job) {
   let score = 0;
   const content = ((job.title || '') + ' ' + (job.stack || []).join(' ')).toLowerCase();
@@ -89,7 +78,7 @@ export async function runScraper() {
   logLines.length = 0;
 
   log('INFO', null, '═══════════════════════════════════════════════════');
-  log('INFO', null, 'Démarrage du scraper Éric V4 max-platforms');
+  log('INFO', null, 'Scraper Éric — Offres tech France');
   log('INFO', null, `Date: ${new Date().toLocaleString('fr-FR')}`);
   log('INFO', null, `Node.js: ${process.version} | OS: ${process.platform} ${process.arch}`);
   log('INFO', null, '═══════════════════════════════════════════════════');
@@ -105,7 +94,7 @@ export async function runScraper() {
   const collectedJobs = [];
 
   const fetchEntries = Object.entries(parsers);
-  log('INFO', null, `${fetchEntries.length} parsers chargés depuis index.js`);
+  log('INFO', null, `${fetchEntries.length} parsers France chargés`);
 
   for (const [parserName, fetchFn] of fetchEntries) {
     parserCount++;
@@ -138,9 +127,8 @@ export async function runScraper() {
       parserStat.found = jobs.length;
       log('INFO', parserLabel, `${jobs.length} offres brutes récupérées (${parserStat.durationMs}ms)`);
 
-      // Exemples des premières offres brutes pour debug
       if (jobs.length > 0) {
-        log('DEBUG', parserLabel, `Exemple offre brute: "${jobs[0].title}" @ ${jobs[0].company} (${jobs[0].location})`);
+        log('DEBUG', parserLabel, `Exemple: "${jobs[0].title}" @ ${jobs[0].company} (${jobs[0].location})`);
       }
 
       const invalidDetails = [];
@@ -163,10 +151,10 @@ export async function runScraper() {
       });
 
       if (invalidDetails.length > 0) {
-        log('DEBUG', parserLabel, `Offres invalides (${invalidDetails.length}):`, invalidDetails.slice(0, 5).join(' | ') + (invalidDetails.length > 5 ? ` ... +${invalidDetails.length - 5}` : ''));
+        log('DEBUG', parserLabel, `Invalides (${invalidDetails.length}):`, invalidDetails.slice(0, 5).join(' | ') + (invalidDetails.length > 5 ? ` ... +${invalidDetails.length - 5}` : ''));
       }
       if (techFilteredDetails.length > 0) {
-        log('DEBUG', parserLabel, `Hors-tech filtrés (${techFilteredDetails.length}):`, techFilteredDetails.slice(0, 5).join(' | ') + (techFilteredDetails.length > 5 ? ` ... +${techFilteredDetails.length - 5}` : ''));
+        log('DEBUG', parserLabel, `Hors-tech (${techFilteredDetails.length}):`, techFilteredDetails.slice(0, 5).join(' | ') + (techFilteredDetails.length > 5 ? ` ... +${techFilteredDetails.length - 5}` : ''));
       }
 
       const deduped = dedupeJobs(normalized);
@@ -193,7 +181,6 @@ export async function runScraper() {
       parserStat.durationMs = Date.now() - t0;
       perParserStats.push(parserStat);
       log('ERROR', parserLabel, `Échec après ${parserStat.durationMs}ms: ${e.message}`);
-      if (e.cause) log('DEBUG', parserLabel, `Cause: ${e.cause.message || e.cause}`);
     }
   }
 
@@ -201,10 +188,11 @@ export async function runScraper() {
 
   const dbCount = await getJobCount();
   const dedupedAll = dedupeJobs(collectedJobs);
-  const franceCandidates = dedupedAll
-    .map(job => ({ ...job, franceScore: franceScore(job), techScore: techScore(job) }))
-    .filter(job => job.franceScore > 0)
-    .sort((a, b) => (b.franceScore + b.techScore) - (a.franceScore + a.techScore));
+
+  // Scoring tech pour tri par pertinence
+  const rankedJobs = dedupedAll
+    .map(job => ({ ...job, techScore: techScore(job) }))
+    .sort((a, b) => b.techScore - a.techScore);
 
   const sourceHealth = perParserStats.map(s => ({
     parser: s.parser,
@@ -214,7 +202,7 @@ export async function runScraper() {
     durationMs: s.durationMs,
     error: s.error,
     efficiency: s.found ? Number((s.saved / s.found).toFixed(2)) : 0
-  })).sort((a,b) => b.saved - a.saved);
+  })).sort((a, b) => b.saved - a.saved);
 
   const elapsedSec = ((Date.now() - startTime) / 1000).toFixed(1);
 
@@ -230,49 +218,45 @@ export async function runScraper() {
   log('STAT', null, `Hors-tech        : ${techRejected}`);
   log('STAT', null, `Doublons         : ${duplicateCount}`);
   log('STAT', null, `Sauvegardées     : ${totalSaved}`);
-  log('STAT', null, `Candidats France : ${franceCandidates.length}`);
   log('STAT', null, `Total en base    : ${dbCount}`);
 
-  // Tableau récap par parser
   log('STAT', null, '');
   log('STAT', null, 'Détail par parser:');
   for (const s of perParserStats) {
     const icon = s.status === 'ok' ? '✅' : s.status === 'empty' ? '⚪' : '❌';
-    const dur = s.durationMs ? `${(s.durationMs/1000).toFixed(1)}s` : '-';
+    const dur = s.durationMs ? `${(s.durationMs / 1000).toFixed(1)}s` : '-';
     const errMsg = s.error ? ` err="${s.error.slice(0, 80)}"` : '';
     log('STAT', null, `  ${icon} ${s.parser.padEnd(20)} found=${String(s.found).padStart(3)} saved=${String(s.saved).padStart(3)} eff=${(s.efficiency * 100).toFixed(0).padStart(3)}% dur=${dur}${errMsg}`);
   }
 
   log('INFO', null, '💾 Génération des exports JSON...');
   try {
-    const allJobs = await queryAll('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 150');
+    const allJobs = await queryAll('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 200');
     await fs.writeFile('latest_jobs.json', JSON.stringify(allJobs, null, 2));
     await fs.writeFile('all_sources_jobs.json', JSON.stringify(dedupedAll.slice(0, 200), null, 2));
-    await fs.writeFile('france_candidates.json', JSON.stringify(franceCandidates.slice(0, 100), null, 2));
+    await fs.writeFile('france_candidates.json', JSON.stringify(rankedJobs.slice(0, 100), null, 2));
     await fs.writeFile('source_health.json', JSON.stringify(sourceHealth, null, 2));
     await fs.writeFile('scraper_report.json', JSON.stringify({
       generatedAt: new Date().toISOString(),
-      mode: 'max-platforms-v4',
+      mode: 'france-tech',
       durationSec: parseFloat(elapsedSec),
-      summary: { parserCount, successCount, totalFound, skippedInvalid, techRejected, duplicateCount, totalSaved, franceCandidates: franceCandidates.length, dbCount },
+      summary: { parserCount, successCount, totalFound, skippedInvalid, techRejected, duplicateCount, totalSaved, dbCount },
       sourceHealth,
       parsers: perParserStats,
-      franceTop: franceCandidates.slice(0, 20)
+      topJobs: rankedJobs.slice(0, 20)
     }, null, 2));
-    log('OK', null, 'Exports V4 générés.');
+    log('OK', null, 'Exports JSON générés.');
   } catch (e) {
     log('ERROR', null, 'Erreur export JSON: ' + e.message);
   }
 
-  // Sauvegarder le log complet dans un fichier
   try {
     await fs.writeFile(LOG_PATH, logLines.join('\n') + '\n');
-    log('OK', null, `Log détaillé sauvegardé dans ${LOG_PATH}`);
   } catch (e) {
     console.error('Erreur écriture log:', e.message);
   }
 
-  return { perParserStats, sourceHealth, franceCandidates, logLines };
+  return { perParserStats, sourceHealth, rankedJobs, logLines };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

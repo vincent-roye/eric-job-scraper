@@ -1,43 +1,45 @@
 /**
- * Parser pour CareerBuilder
- * International, 140M profils
+ * Parser pour CareerBuilder — offres France
  */
 
-const CAREERBUILDER_API = 'https://api.careerbuilder.com/v1/jobsearch?DeveloperKey=DEMO&Keyword=developer&Location=France&PerPage=50';
+import { safeFetch } from './utils.js';
+
+const URLS = [
+  'https://api.careerbuilder.com/v1/jobsearch?DeveloperKey=DEMO&Keyword=développeur&Location=France&PerPage=50',
+  'https://api.careerbuilder.com/v1/jobsearch?DeveloperKey=DEMO&Keyword=developer&Location=Paris&PerPage=50',
+];
 
 export async function fetchJobs() {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+  const allJobs = [];
+  for (const url of URLS) {
+    try {
+      const res = await safeFetch(url, {
+        headers: { 'Accept': 'application/json' }
+      }, 15000);
 
-    const res = await fetch(CAREERBUILDER_API, { 
-      signal: controller.signal,
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json'
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const jobs = data?.JobSearchResponse?.Jobs?.Job || [];
+
+      for (const job of jobs) {
+        if (job.AbsoluteURL) {
+          allJobs.push({
+            title: job.JobTitle || '',
+            company: job.Company?.Name || '',
+            location: job.Location?.Name || 'France',
+            url: job.AbsoluteURL,
+            source: 'CareerBuilder',
+            publishedAt: job.CreatedOn || '',
+            stack: [],
+            type: 'Full-time'
+          });
+        }
       }
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    const jobs = data?.JobSearchResponse?.Jobs?.Job || [];
-
-    return jobs.map(job => {
-      return {
-        title: job.JobTitle || '',
-        company: job.Company?.Name || '',
-        location: job.Location?.Name || 'France',
-        url: job.AbsoluteURL || '',
-        source: 'CareerBuilder',
-        publishedAt: job.CreatedOn || '',
-        stack: [],
-        type: 'Full-time'
-      };
-    }).filter(j => j.url);
-  } catch (e) {
-    console.error('CareerBuilder error:', e.message);
-    return [];
+    } catch (e) {
+      console.error('CareerBuilder error:', e.message);
+    }
   }
+  console.log(`[CareerBuilder] Found ${allJobs.length} jobs`);
+  return allJobs;
 }
